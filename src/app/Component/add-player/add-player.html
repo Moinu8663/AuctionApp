@@ -1,0 +1,168 @@
+<!-- DELETE MODE -->
+@if (isDelete) {
+  <h2 mat-dialog-title>Delete Player</h2>
+  <mat-dialog-content>
+    <div class="delete-confirm">
+      <div class="delete-avatar">{{ dialogData?.playerName?.[0]?.toUpperCase() }}</div>
+      <p>Are you sure you want to delete <strong>{{ dialogData?.playerName }}</strong>?</p>
+      <p class="delete-sub">This action cannot be undone.</p>
+      @if (errorMsg) { <div class="error-box"><mat-icon>error</mat-icon> {{ errorMsg }}</div> }
+    </div>
+  </mat-dialog-content>
+  <mat-dialog-actions align="end">
+    <button mat-button (click)="dialogRef!.close(false)">Cancel</button>
+    <button mat-flat-button class="delete-btn" [disabled]="loading" (click)="onDelete()">
+      @if (loading) { <mat-spinner diameter="18"></mat-spinner> } @else { Yes, Delete }
+    </button>
+  </mat-dialog-actions>
+}
+
+<!-- ADD / EDIT MODE -->
+@if (!isDelete) {
+  <h2 mat-dialog-title>{{ isEdit ? 'Edit Player' : 'Add Player' }}</h2>
+
+  <mat-dialog-content>
+    <form [formGroup]="form" class="dialog-form">
+
+      <!-- Player Name -->
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Player Name</mat-label>
+        <input matInput formControlName="playerName" placeholder="e.g. Virat Kohli">
+        <mat-icon matPrefix>person</mat-icon>
+        @if (f['playerName'].touched && f['playerName'].hasError('required')) {
+          <mat-error>Player name is required</mat-error>
+        }
+      </mat-form-field>
+
+      <!-- Pic Upload -->
+      <div class="logo-upload">
+        <label class="logo-label">Player Photo</label>
+        <div class="logo-row">
+          @if (picPreview) {
+            <img [src]="picPreview" class="logo-preview" alt="Player Photo" />
+          } @else {
+            <div class="logo-placeholder"><mat-icon>account_circle</mat-icon></div>
+          }
+          <label class="upload-btn">
+            @if (uploading) {
+              <mat-spinner diameter="18"></mat-spinner>
+            } @else {
+              <mat-icon>upload</mat-icon> {{ picPreview ? 'Change Photo' : 'Upload Photo' }}
+            }
+            <input type="file" accept="image/*" hidden (change)="onFileSelect($event)">
+          </label>
+        </div>
+      </div>
+
+      <!-- Age -->
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Age</mat-label>
+        <input matInput formControlName="age" type="number" placeholder="e.g. 28">
+        <mat-icon matPrefix>cake</mat-icon>
+        @if (f['age'].touched && f['age'].hasError('required')) {
+          <mat-error>Age is required</mat-error>
+        }
+        @if (f['age'].touched && (f['age'].hasError('min') || f['age'].hasError('max'))) {
+          <mat-error>Age must be between 10 and 60</mat-error>
+        }
+      </mat-form-field>
+
+      <!-- Mobile -->
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Mobile</mat-label>
+        <input matInput formControlName="mobile" placeholder="10-digit number">
+        <mat-icon matPrefix>phone</mat-icon>
+        @if (f['mobile'].touched && f['mobile'].hasError('required')) {
+          <mat-error>Mobile is required</mat-error>
+        }
+        @if (f['mobile'].touched && f['mobile'].hasError('pattern')) {
+          <mat-error>Enter a valid 10-digit number</mat-error>
+        }
+      </mat-form-field>
+
+      <!-- Email -->
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Email</mat-label>
+        <input matInput formControlName="email" placeholder="e.g. player@example.com">
+        <mat-icon matPrefix>email</mat-icon>
+        @if (f['email'].touched && f['email'].hasError('required')) {
+          <mat-error>Email is required</mat-error>
+        }
+        @if (f['email'].touched && f['email'].hasError('email')) {
+          <mat-error>Enter a valid email</mat-error>
+        }
+      </mat-form-field>
+
+      <!-- Country -->
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Country</mat-label>
+        <input matInput formControlName="country" placeholder="e.g. India">
+        <mat-icon matPrefix>flag</mat-icon>
+        @if (f['country'].touched && f['country'].hasError('required')) {
+          <mat-error>Country is required</mat-error>
+        }
+      </mat-form-field>
+
+      <!-- Role -->
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Role</mat-label>
+        <mat-select formControlName="role">
+          <mat-option value="Batsman">Batsman</mat-option>
+          <mat-option value="Bowler">Bowler</mat-option>
+          <mat-option value="All-Rounder">All-Rounder</mat-option>
+          <mat-option value="Wicket-Keeper">Wicket-Keeper</mat-option>
+        </mat-select>
+        <mat-icon matPrefix>sports_cricket</mat-icon>
+        @if (f['role'].touched && f['role'].hasError('required')) {
+          <mat-error>Role is required</mat-error>
+        }
+      </mat-form-field>
+
+      <!-- Base Price -->
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Base Price (₹)</mat-label>
+        <input matInput formControlName="basePrice" type="number" placeholder="e.g. 2000000">
+        <mat-icon matPrefix>currency_rupee</mat-icon>
+        @if (f['basePrice'].touched && f['basePrice'].hasError('required')) {
+          <mat-error>Base price is required</mat-error>
+        }
+      </mat-form-field>
+
+      <!-- Auction -->
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Auction</mat-label>
+        <mat-select formControlName="auctionId" [compareWith]="compareById">
+          @for (auction of auctions; track auction.auctionId) {
+            <mat-option [value]="auction.auctionId">{{ auction.auctionName }}</mat-option>
+          }
+        </mat-select>
+        <mat-icon matPrefix>event</mat-icon>
+        @if (f['auctionId'].touched && f['auctionId'].hasError('required')) {
+          <mat-error>Auction is required</mat-error>
+        }
+      </mat-form-field>
+
+      <!-- Team (optional) -->
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Team (optional)</mat-label>
+        <mat-select formControlName="teamId" [compareWith]="compareById">
+          <mat-option [value]="null">— None —</mat-option>
+          @for (team of teams; track team.id) {
+            <mat-option [value]="team.id">{{ team.teamName }}</mat-option>
+          }
+        </mat-select>
+        <mat-icon matPrefix>groups</mat-icon>
+      </mat-form-field>
+
+      @if (errorMsg) { <div class="error-box"><mat-icon>error</mat-icon> {{ errorMsg }}</div> }
+
+    </form>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button mat-button (click)="dialogRef!.close(false)">Cancel</button>
+    <button mat-flat-button class="save-btn" [disabled]="form.invalid || loading" (click)="onSubmit()">
+      @if (loading) { <mat-spinner diameter="18"></mat-spinner> } @else { {{ isEdit ? 'Save' : 'Add Player' }} }
+    </button>
+  </mat-dialog-actions>
+}

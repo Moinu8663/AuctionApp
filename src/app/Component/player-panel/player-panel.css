@@ -1,0 +1,31 @@
+.panel-page { display: flex; flex-direction: column; gap: 20px; }
+.page-header { display: flex; align-items: center; justify-content: space-between; }
+.page-header h2 { font-size: 1.2rem; font-weight: 700; color: #0f172a; margin: 0 0 4px; }
+.page-header p { font-size: 0.82rem; color: #64748b; margin: 0; }
+.add-btn { display: flex; align-items: center; gap: 6px; padding: 10px 20px; border: none; border-radius: 10px; background: linear-gradient(90deg, #6366f1, #8b5cf6); color: white; font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: opacity 0.2s; }
+.add-btn:hover { opacity: 0.88; }
+.loader { display: flex; justify-content: center; padding: 60px 0; }
+::ng-deep .loader .mat-mdc-progress-spinner circle { stroke: #6366f1; }
+.table-wrapper { background: white; border-radius: 14px; overflow-x: auto; overflow-y: hidden; box-shadow: 0 2px 12px rgba(0,0,0,0.06); }
+.table-wrapper::-webkit-scrollbar { width: 6px; height: 6px; }
+.table-wrapper::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 10px; }
+.table-wrapper::-webkit-scrollbar-thumb { background: #6366f1; border-radius: 10px; }
+.table-wrapper::-webkit-scrollbar-thumb:hover { background: #4f46e5; }
+.panel-table { width: max-content; min-width: 100%; }
+.mat-mdc-header-row { background: linear-gradient(90deg, #0f172a, #1e1b4b); }
+.mat-mdc-header-cell { color: #cbd5f5 !important; font-size: 0.82rem; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; border: none !important; }
+.mat-mdc-row:hover { background: #f8fafc; }
+.mat-mdc-cell { font-size: 0.88rem; color: #334155; border-bottom: 1px solid #f1f5f9 !important; }
+.name-cell { display: flex; align-items: center; gap: 10px; }
+.avatar { width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, #6366f1, #8b5cf6); color: white; font-size: 0.85rem; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.avatar-img { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; border: 2px solid #e2e8f0; flex-shrink: 0; }
+.pic-thumb { width: 36px; height: 36px; border-radius: 6px; object-fit: cover; border: 1px solid #e2e8f0; }
+.role-badge { font-size: 0.75rem; font-weight: 600; padding: 3px 10px; border-radius: 20px; }
+.role-badge.batsman { background: #dbeafe; color: #1d4ed8; }
+.role-badge.bowler { background: #dcfce7; color: #15803d; }
+.role-badge.all-rounder { background: #ede9fe; color: #6d28d9; }
+.role-badge.wicket-keeper { background: #fef9c3; color: #a16207; }
+.price { font-weight: 600; color: #0f172a; }
+.edit-btn { color: #6366f1 !important; }
+.delete-btn { color: #dc2626 !important; }
+.empty-cell { text-align: center; padding: 40px; color: #94a3b8; font-size: 0.9rem; }

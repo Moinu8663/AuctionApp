@@ -1,0 +1,163 @@
+@if (isDialog) {
+
+  <!-- ===== DELETE MODE ===== -->
+  @if (isDelete) {
+    <h2 mat-dialog-title>Delete Admin</h2>
+    <mat-dialog-content>
+      <div class="delete-confirm">
+        <div class="delete-avatar">{{ dialogData?.name?.[0]?.toUpperCase() }}</div>
+        <p>Are you sure you want to delete <strong>{{ dialogData?.name }}</strong>?</p>
+        <p class="delete-sub">This action cannot be undone.</p>
+        @if (errorMsg) {
+          <div class="error-box"><mat-icon>error</mat-icon> {{ errorMsg }}</div>
+        }
+      </div>
+    </mat-dialog-content>
+    <mat-dialog-actions align="end">
+      <button mat-button (click)="dialogRef!.close(false)">Cancel</button>
+      <button mat-flat-button class="delete-btn" [disabled]="loading" (click)="onDelete()">
+        @if (loading) { <mat-spinner diameter="18"></mat-spinner> } @else { Yes, Delete }
+      </button>
+    </mat-dialog-actions>
+  }
+
+  <!-- ===== ADD / EDIT MODE ===== -->
+  @if (!isDelete) {
+    <h2 mat-dialog-title>{{ isEdit ? 'Edit Admin' : 'Register Admin' }}</h2>
+    <mat-dialog-content>
+      <ng-container *ngTemplateOutlet="formTpl"></ng-container>
+    </mat-dialog-content>
+    <mat-dialog-actions align="end">
+      <button mat-button (click)="dialogRef!.close()">Cancel</button>
+      <button mat-flat-button class="register-btn"
+              [disabled]="registerForm.invalid || loading" (click)="onSubmit()">
+        @if (loading) { <mat-spinner diameter="18"></mat-spinner> } @else { {{ isEdit ? 'Save' : 'Register' }} }
+      </button>
+    </mat-dialog-actions>
+  }
+
+} @else {
+
+  <!-- ===== STANDALONE PAGE MODE ===== -->
+  <div class="register-wrapper">
+    <div class="illustration-panel">
+      <div class="content">
+        <h1>Cricket Auction</h1>
+        <p>Join the league. Build your dream team and bid like a champion.</p>
+      </div>
+    </div>
+    <div class="form-panel">
+      <div class="form-card">
+        <h2>Create Account 🏏</h2>
+        <p class="subtitle">Fill in the details to get started</p>
+        <ng-container *ngTemplateOutlet="formTpl"></ng-container>
+        <p class="login-link">Already have an account? <a routerLink="/login">Sign in</a></p>
+      </div>
+    </div>
+  </div>
+
+}
+
+<!-- ===== SHARED FORM TEMPLATE ===== -->
+<ng-template #formTpl>
+  <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="dialog-form">
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Full Name</mat-label>
+      <input matInput formControlName="name" placeholder="John Doe">
+      <mat-icon matPrefix>badge</mat-icon>
+      @if (f['name'].touched && f['name'].hasError('required')) {
+        <mat-error>Name is required</mat-error>
+      }
+      @if (f['name'].touched && f['name'].hasError('minlength')) {
+        <mat-error>Minimum 3 characters</mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Email</mat-label>
+      <input matInput formControlName="email" placeholder="you@example.com">
+      <mat-icon matPrefix>email</mat-icon>
+      @if (f['email'].touched && f['email'].hasError('required')) {
+        <mat-error>Email is required</mat-error>
+      }
+      @if (f['email'].touched && f['email'].hasError('email')) {
+        <mat-error>Enter a valid email</mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Mobile</mat-label>
+      <input matInput formControlName="mobile" placeholder="10-digit number">
+      <mat-icon matPrefix>phone</mat-icon>
+      @if (f['mobile'].touched && f['mobile'].hasError('required')) {
+        <mat-error>Mobile is required</mat-error>
+      }
+      @if (f['mobile'].touched && f['mobile'].hasError('pattern')) {
+        <mat-error>Enter a valid 10-digit number</mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Role</mat-label>
+      <mat-select formControlName="role">
+        <mat-option value="SuperAdmin">SuperAdmin</mat-option>
+        <mat-option value="Admin">Admin</mat-option>
+        <mat-option value="User">User</mat-option>
+      </mat-select>
+      <mat-icon matPrefix>manage_accounts</mat-icon>
+      @if (f['role'].touched && f['role'].hasError('required')) {
+        <mat-error>Role is required</mat-error>
+      }
+    </mat-form-field>
+
+    @if (!isEdit) {
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Password</mat-label>
+        <input matInput formControlName="password"
+               [type]="hidePassword() ? 'password' : 'text'">
+        <mat-icon matPrefix>lock</mat-icon>
+        <button mat-icon-button matSuffix type="button"
+                (click)="hidePassword.set(!hidePassword())">
+          <mat-icon>{{ hidePassword() ? 'visibility_off' : 'visibility' }}</mat-icon>
+        </button>
+        @if (f['password'].touched && f['password'].hasError('required')) {
+          <mat-error>Password is required</mat-error>
+        }
+        @if (f['password'].touched && f['password'].hasError('minlength')) {
+          <mat-error>Minimum 8 characters</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Confirm Password</mat-label>
+        <input matInput formControlName="confirmPassword"
+               [type]="hideConfirm() ? 'password' : 'text'">
+        <mat-icon matPrefix>lock_reset</mat-icon>
+        <button mat-icon-button matSuffix type="button"
+                (click)="hideConfirm.set(!hideConfirm())">
+          <mat-icon>{{ hideConfirm() ? 'visibility_off' : 'visibility' }}</mat-icon>
+        </button>
+        @if (f['confirmPassword'].touched && registerForm.hasError('passwordMismatch')) {
+          <mat-error>Passwords do not match</mat-error>
+        }
+      </mat-form-field>
+    }
+
+    @if (errorMsg) {
+      <div class="error-box"><mat-icon>error</mat-icon> {{ errorMsg }}</div>
+    }
+
+    @if (successMsg) {
+      <div class="success-box"><mat-icon>check_circle</mat-icon> {{ successMsg }}</div>
+    }
+
+    @if (!isDialog) {
+      <button mat-flat-button class="register-btn"
+              [disabled]="registerForm.invalid || loading">
+        @if (loading) { <mat-spinner diameter="20"></mat-spinner> } @else { Register }
+      </button>
+    }
+
+  </form>
+</ng-template>

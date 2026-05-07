@@ -1,0 +1,65 @@
+<div class="home">
+
+  <!-- Welcome Banner -->
+  <div class="banner">
+    <div class="banner-text">
+      <h1>Welcome back, <span>{{ username }}</span> 👋</h1>
+      <p>Here's what's happening in today's auction.</p>
+    </div>
+    <div class="banner-icon">🏆</div>
+  </div>
+
+  <!-- Stats Cards -->
+  <div class="stats">
+    <div class="stat-card">
+      <div class="stat-icon">🏆</div>
+      <div>
+        <div class="stat-value">{{ stats.auctions }}</div>
+        <div class="stat-label">Auctions</div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">🛡️</div>
+      <div>
+        <div class="stat-value">{{ stats.teams }}</div>
+        <div class="stat-label">Teams</div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">🏏</div>
+      <div>
+        <div class="stat-value">{{ stats.players }}</div>
+        <div class="stat-label">Players</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Recent Activity -->
+  <div class="section">
+    <h2>Recent Activity</h2>
+
+    @if (activityLoading) {
+      <div class="activity-loader"><mat-spinner diameter="36"></mat-spinner></div>
+    }
+
+    @if (!activityLoading && recentActivity.length === 0) {
+      <div class="empty-activity">No recent activity found.</div>
+    }
+
+    @if (!activityLoading && recentActivity.length > 0) {
+      <div class="activity-list">
+        @for (item of recentActivity; track $index) {
+          <div class="activity-item">
+            <div class="activity-icon {{ item.type }}">{{ item.icon }}</div>
+            <div class="activity-info">
+              <div class="activity-label">{{ item.label }}</div>
+              <div class="activity-sub">{{ item.sub }}</div>
+            </div>
+            <div class="activity-date">{{ item.date | date: 'dd MMM, hh:mm a' }}</div>
+          </div>
+        }
+      </div>
+    }
+  </div>
+
+</div>

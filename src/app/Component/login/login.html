@@ -1,0 +1,116 @@
+<div class="login-wrapper">
+
+  <!-- LEFT PANEL -->
+  <div class="illustration-panel">
+    <div class="mesh"></div>
+    <div class="illustration-content">
+      <div class="trophy">🏆</div>
+      <h1>CricAuction Pro</h1>
+      <p>Build your dream team, bid like a champion, and dominate the league.</p>
+      <div class="stats-row">
+        <div class="stat">
+          <span class="stat-value">500+</span>
+          <span class="stat-label">Players</span>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat">
+          <span class="stat-value">50+</span>
+          <span class="stat-label">Teams</span>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat">
+          <span class="stat-value">20+</span>
+          <span class="stat-label">Auctions</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT PANEL -->
+  <div class="form-panel">
+    <div class="form-card">
+
+      <!-- Logo -->
+      <div class="card-logo">🏏</div>
+      <h2>Welcome Back</h2>
+      <p class="subtitle">Sign in to your account</p>
+
+      <mat-tab-group animationDuration="200ms" class="login-tabs" (selectedTabChange)="onTabChange()">
+
+        <!-- Tab 1: Password Login -->
+        <mat-tab label="Password">
+          <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="tab-form">
+
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Email / Username</mat-label>
+              <input matInput formControlName="username" placeholder="Enter your email">
+              <mat-icon matPrefix>person_outline</mat-icon>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Password</mat-label>
+              <input matInput formControlName="password"
+                     [type]="hidePassword() ? 'password' : 'text'"
+                     placeholder="Enter your password">
+              <mat-icon matPrefix>lock_outline</mat-icon>
+              <button mat-icon-button matSuffix type="button"
+                      (click)="hidePassword.set(!hidePassword())">
+                <mat-icon>{{ hidePassword() ? 'visibility_off' : 'visibility' }}</mat-icon>
+              </button>
+            </mat-form-field>
+
+            @if (errorMsg) {
+              <div class="error-box">
+                <mat-icon>error_outline</mat-icon>
+                {{ errorMsg }}
+              </div>
+            }
+
+            <button mat-flat-button class="login-btn" [disabled]="loginForm.invalid || loading">
+              @if (loading) {
+                <mat-spinner diameter="20"></mat-spinner>
+              } @else {
+                <mat-icon>login</mat-icon> Sign In
+              }
+            </button>
+
+          </form>
+        </mat-tab>
+
+        <!-- Tab 2: MPIN Login -->
+        <mat-tab label="MPIN">
+          <form [formGroup]="loginMpinForm" (ngSubmit)="onSubmitMpin()" class="tab-form">
+
+            <div class="mpin-hint">Enter your 4–6 digit MPIN to sign in quickly.</div>
+
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>MPIN</mat-label>
+              <input matInput formControlName="mpin" type="password"
+                     placeholder="••••••" maxlength="6">
+              <mat-icon matPrefix>pin</mat-icon>
+            </mat-form-field>
+
+            @if (errorMsg) {
+              <div class="error-box">
+                <mat-icon>error_outline</mat-icon>
+                {{ errorMsg }}
+              </div>
+            }
+
+            <button mat-flat-button class="login-btn" [disabled]="loginMpinForm.invalid || loading">
+              @if (loading) {
+                <mat-spinner diameter="20"></mat-spinner>
+              } @else {
+                <mat-icon>lock_open</mat-icon> Sign In with MPIN
+              }
+            </button>
+
+          </form>
+        </mat-tab>
+
+      </mat-tab-group>
+
+    </div>
+  </div>
+
+</div>
