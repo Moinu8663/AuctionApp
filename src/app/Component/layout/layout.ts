@@ -17,7 +17,7 @@ export interface MenuItem {
 
 @Component({
   selector: 'app-layout',
-  imports: [RouterModule, NgClass, MatMenuModule, MatIconModule, MatButtonModule, MatDividerModule],
+  imports: [RouterModule, MatMenuModule, MatIconModule, MatButtonModule, MatDividerModule],
   templateUrl: './layout.html',
   styleUrl: './layout.css',
 })

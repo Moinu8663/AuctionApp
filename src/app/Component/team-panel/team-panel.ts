@@ -10,12 +10,11 @@ import { TeamService } from '../../Services/TeamService/team-service';
 import { AddTeam } from '../add-team/add-team';
 import { Subject, takeUntil } from 'rxjs';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { STATUS_CODES } from 'http';
+
 
 @Component({
   selector: 'app-team-panel',
   imports: [
-    DecimalPipe,
     MatTableModule, MatButtonModule, MatIconModule,
     MatDialogModule, MatProgressSpinnerModule, MatTooltipModule,
   ],
