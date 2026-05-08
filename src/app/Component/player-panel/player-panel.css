@@ -29,3 +29,8 @@
 .edit-btn { color: #6366f1 !important; }
 .delete-btn { color: #dc2626 !important; }
 .empty-cell { text-align: center; padding: 40px; color: #94a3b8; font-size: 0.9rem; }
+
+@media (max-width: 768px) {
+  .page-header { flex-direction: column; align-items: flex-start; gap: 10px; }
+  .add-btn { width: 100%; justify-content: center; }
+}

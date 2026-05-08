@@ -1,4 +1,4 @@
-.dialog-form { display: flex; flex-direction: column; padding-top: 8px; min-width: 380px; }
+.dialog-form { display: flex; flex-direction: column; padding-top: 8px; min-width: min(380px, 80vw); width: 100%; }
 .full-width { width: 100%; }
 .save-btn { background: linear-gradient(90deg, #6366f1, #8b5cf6); color: white; border-radius: 8px; }
 .delete-btn { background: #fee2e2; color: #dc2626; border-radius: 8px; }

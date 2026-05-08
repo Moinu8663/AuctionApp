@@ -1,64 +1,65 @@
 <div class="layout">
 
+  <!-- Mobile overlay -->
+  @if (isMobileOpen) {
+    <div class="sidebar-overlay" (click)="closeMobileSidebar()"></div>
+  }
+
   <!-- Sidebar -->
-  @if(isSidebarVisible){
-  <aside>
+  @if (isSidebarVisible || isMobileOpen) {
+    <aside [class.mobile-open]="isMobileOpen">
 
-    <!-- Logo -->
-    <div class="logo">
-      <span class="logo-icon">🏆</span>
-        <span class="logo-text">Auction</span>
+      <div class="logo">
+        <span class="logo-icon">🏆</span>
+        <span class="logo-text">CricAuction Pro</span>
+      </div>
 
-    </div>
+      <nav>
+        @for (menu of menus; track menu.name) {
+          @if (hasRole(menu.roles)) {
 
-    <!-- Menu -->
- <nav>
-  @for(menu of menus; track menu.name){
-    @if(hasRole(menu.roles)){
-
-      <!-- Parent with children -->
-      @if(menu.children){
-        <div class="menu-parent" (click)="toggleExpand(menu.name)">
-          <span>{{menu.icon}}</span>
-          <span class="menu-parent-name">{{menu.name}}</span>
-          <span class="chevron" [class.open]="isExpanded(menu.name)">›</span>
-        </div>
-        @if(isExpanded(menu.name)){
-          <div class="menu-children">
-            @for(child of menu.children; track child.name){
-              @if(hasRole(child.roles)){
-                <a [routerLink]="child.route" routerLinkActive="active" class="menu-child">
-                  <span>{{child.icon}}</span>
-                  <span>{{child.name}}</span>
-                </a>
+            @if (menu.children) {
+              <div class="menu-parent" (click)="toggleExpand(menu.name)">
+                <span>{{ menu.icon }}</span>
+                <span class="menu-parent-name">{{ menu.name }}</span>
+                <span class="chevron" [class.open]="isExpanded(menu.name)">›</span>
+              </div>
+              @if (isExpanded(menu.name)) {
+                <div class="menu-children">
+                  @for (child of menu.children; track child.name) {
+                    @if (hasRole(child.roles)) {
+                      <a [routerLink]="child.route" routerLinkActive="active" class="menu-child" (click)="closeMobileSidebar()">
+                        <span>{{ child.icon }}</span>
+                        <span>{{ child.name }}</span>
+                      </a>
+                    }
+                  }
+                </div>
               }
             }
-          </div>
+
+            @if (!menu.children) {
+              <a [routerLink]="menu.route" routerLinkActive="active" (click)="closeMobileSidebar()">
+                <span>{{ menu.icon }}</span>
+                <span>{{ menu.name }}</span>
+              </a>
+            }
+
+          }
         }
-      }
+      </nav>
 
-      <!-- Simple link -->
-      @if(!menu.children){
-        <a [routerLink]="menu.route" routerLinkActive="active">
-          <span>{{menu.icon}}</span>
-          <span>{{menu.name}}</span>
-        </a>
-      }
-
-    }
-  }
-</nav>
-
-  </aside>
+    </aside>
   }
 
   <!-- Main -->
-  <div class="main" >
+  <div class="main">
 
-    <!-- Navbar -->
     <header>
-      <button (click)="toggleSidebar()">☰</button>
-      <h3>My App</h3>
+      <button mat-icon-button (click)="toggleSidebar()">
+        <mat-icon>menu</mat-icon>
+      </button>
+      <h3>CricAuction Pro</h3>
       <span class="spacer"></span>
 
       <div class="profile-section">
@@ -71,14 +72,11 @@
             <strong>{{ username }}</strong>
             <div style="font-size:12px; opacity:0.6;">{{ role }}</div>
           </div>
-
           <mat-divider></mat-divider>
-
           <button mat-menu-item (click)="profile()">
             <mat-icon>person</mat-icon>
             <span>Profile</span>
           </button>
-
           <button mat-menu-item (click)="Logout()">
             <mat-icon>logout</mat-icon>
             <span>Logout</span>
@@ -87,7 +85,6 @@
       </div>
     </header>
 
-    <!-- Content -->
     <section class="content">
       <router-outlet></router-outlet>
     </section>

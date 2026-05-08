@@ -26,6 +26,11 @@ export class Layout {
   private readonly router = inject(Router);
 
   isSidebarVisible = true;
+  isMobileOpen = false;
+
+  private get isMobile(): boolean {
+    return typeof window !== 'undefined' && window.innerWidth <= 768;
+  }
   username = '';
   role = '';
 
@@ -66,7 +71,15 @@ export class Layout {
     return this.expandedMenus.has(name);
   }
 
-  toggleSidebar() { this.isSidebarVisible = !this.isSidebarVisible; }
+  toggleSidebar() {
+    if (this.isMobile) {
+      this.isMobileOpen = !this.isMobileOpen;
+    } else {
+      this.isSidebarVisible = !this.isSidebarVisible;
+    }
+  }
+
+  closeMobileSidebar() { this.isMobileOpen = false; }
   Logout() { this.login.logout(); }
   profile() { this.router.navigate(['/profile']); }
 }

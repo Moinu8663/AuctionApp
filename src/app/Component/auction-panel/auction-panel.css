@@ -22,3 +22,14 @@
 .edit-btn { color: #6366f1 !important; }
 .delete-btn { color: #dc2626 !important; }
 .empty-cell { text-align: center; padding: 40px; color: #94a3b8; font-size: 0.9rem; }
+
+.table-wrapper { overflow-x: auto; }
+.panel-table { width: max-content; min-width: 100%; }
+.table-wrapper::-webkit-scrollbar { height: 6px; }
+.table-wrapper::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 10px; }
+.table-wrapper::-webkit-scrollbar-thumb { background: #6366f1; border-radius: 10px; }
+
+@media (max-width: 768px) {
+  .page-header { flex-direction: column; align-items: flex-start; gap: 10px; }
+  .add-btn { width: 100%; justify-content: center; }
+}

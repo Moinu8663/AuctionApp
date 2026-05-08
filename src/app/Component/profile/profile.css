@@ -258,3 +258,15 @@
   display: flex;
   gap: 12px;
 }
+
+@media (max-width: 600px) {
+  .profile-page { padding: 12px; }
+  .profile-card { padding: 20px 16px; }
+  .avatar-section { flex-direction: column; text-align: center; }
+  .actions { flex-direction: column; }
+  .actions button, .actions .btn-edit, .actions .btn-mpin,
+  .actions .btn-reset, .actions .btn-delete, .actions .btn-cancel { width: 100%; }
+  .detail-row { flex-direction: column; align-items: flex-start; gap: 4px; }
+  .dialog { width: calc(100vw - 32px); padding: 24px 16px; }
+  .dialog-actions { flex-direction: column; }
+}
