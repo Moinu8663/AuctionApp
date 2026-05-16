@@ -1,82 +1,40 @@
-import { inject, Injectable, PLATFORM_ID } from '@angular/core';
-import { environment } from '../../environments/environment';
+import { isPlatformBrowser } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-import { Observable, tap } from 'rxjs';
+import { inject, Injectable, PLATFORM_ID } from '@angular/core';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
 import { jwtDecode } from 'jwt-decode';
-import { isPlatformBrowser } from '@angular/common';
-import { MatSnackBar } from '@angular/material/snack-bar';
+import { Observable, tap } from 'rxjs';
+import { environment } from '../../environments/environment';
+
+interface LoginResponse {
+  token: string;
+  email: string;
+  role: string;
+  name?: string;
+}
 
 @Injectable({
   providedIn: 'root',
 })
 export class Login {
-  private baseUrl = environment.apiBaseUrl;
+  private readonly baseUrl = environment.apiBaseUrl;
   private readonly http = inject(HttpClient);
   private readonly router = inject(Router);
   private readonly snackBar = inject(MatSnackBar);
-  private platformId = inject(PLATFORM_ID);
-  private isBrowser = isPlatformBrowser(this.platformId);
-  private logoutTimer: any;
+  private readonly platformId = inject(PLATFORM_ID);
+  private readonly isBrowser = isPlatformBrowser(this.platformId);
+  private logoutTimer: ReturnType<typeof setTimeout> | null = null;
 
-  // helper method
-  private getStorage() {
-    return this.isBrowser ? sessionStorage : null;
+  login(data: any): Observable<LoginResponse> {
+    return this.authenticate('Login/login', data);
   }
 
-  login(data: any): Observable<any> {
-    return this.http.post<any>(`${this.baseUrl}Login/login`, data).pipe(
-      tap((res) => {
-        const token = res.token;
-        this.getStorage()?.setItem('token', token);
-        this.getStorage()?.setItem('email', res.email);
-        this.getStorage()?.setItem('role', res.role);
-
-        // ✅ Decode JWT
-        const decoded: any = jwtDecode(token);
-
-        // exp is in seconds → convert to ms
-        const expiryTime = decoded.exp * 1000;
-
-        // remaining time
-        const remainingTime = expiryTime - Date.now();
-
-        // store expiry (optional but useful for refresh)
-        this.getStorage()?.setItem('expiry', expiryTime.toString());
-
-        // start timer
-        this.startLogoutTimer(remainingTime);
-      })
-    );
-  }
-    loginMpin(data: any): Observable<any> {
-    return this.http.post<any>(`${this.baseUrl}Login/loginWithMpin`, data).pipe(
-      tap((res) => {
-        const token = res.token;
-        this.getStorage()?.setItem('token', token);
-        this.getStorage()?.setItem('email', res.email);
-        this.getStorage()?.setItem('role', res.role);
-
-        // ✅ Decode JWT
-        const decoded: any = jwtDecode(token);
-
-        // exp is in seconds → convert to ms
-        const expiryTime = decoded.exp * 1000;
-
-        // remaining time
-        const remainingTime = expiryTime - Date.now();
-
-        // store expiry (optional but useful for refresh)
-        this.getStorage()?.setItem('expiry', expiryTime.toString());
-
-        // start timer
-        this.startLogoutTimer(remainingTime);
-      })
-    );
+  loginMpin(data: any): Observable<LoginResponse> {
+    return this.authenticate('Login/loginWithMpin', data);
   }
 
-  // ✅ AUTO LOGOUT TIMER
-  startLogoutTimer(duration: number) {
+  startLogoutTimer(duration: number): void {
     this.clearLogoutTimer();
 
     if (duration <= 0) {
@@ -94,52 +52,72 @@ export class Login {
     }, duration);
   }
 
-  // ✅ RESTORE SESSION AFTER REFRESH
-  checkSession() {
-      const storage = this.getStorage();
-  if (!storage) return;
+  checkSession(): void {
+    const storage = this.getStorage();
+    if (!storage) return;
 
-  const expiry = storage.getItem('expiry');
+    const expiry = Number(storage.getItem('expiry'));
+    if (!expiry) return;
 
-    if (expiry) {
-      const remaining = +expiry - Date.now();
-
-      if (remaining > 0) {
-        this.startLogoutTimer(remaining);
-      } else {
-        this.logout();
-      }
+    const remaining = expiry - Date.now();
+    if (remaining > 0) {
+      this.startLogoutTimer(remaining);
+    } else {
+      this.logout();
     }
   }
 
-  // ✅ CLEAR TIMER
-  clearLogoutTimer() {
-    if (this.logoutTimer) {
-      clearTimeout(this.logoutTimer);
-    }
+  clearLogoutTimer(): void {
+    if (!this.logoutTimer) return;
+
+    clearTimeout(this.logoutTimer);
+    this.logoutTimer = null;
   }
 
-  // ✅ MANUAL LOGOUT
-  logout() {
+  logout(): void {
     this.clearLogoutTimer();
+    this.getStorage()?.clear();
 
-  const storage = this.getStorage();
-  storage?.clear(); 
-
-  if (this.isBrowser) {
-    this.router.navigate(['/login']);
-  }
-
+    if (this.isBrowser) {
+      this.router.navigate(['/login']);
+    }
   }
 
   isLoggedIn(): boolean {
-    const storage = this.getStorage();
-    return !!storage?.getItem('token');
+    return !!this.getStorage()?.getItem('token');
   }
 
   getRole(): string | null {
-    const storage = this.getStorage();
-    return storage?.getItem('role') ?? null;
+    return this.getStorage()?.getItem('role') ?? null;
   }
 
+  private authenticate(endpoint: string, data: any): Observable<LoginResponse> {
+    return this.http.post<LoginResponse>(`${this.baseUrl}${endpoint}`, data).pipe(
+      tap((res) => this.storeSession(res))
+    );
+  }
+
+  private storeSession(res: LoginResponse): void {
+    const storage = this.getStorage();
+    if (!storage) return;
+
+    const expiryTime = this.getTokenExpiryTime(res.token);
+
+    storage.setItem('token', res.token);
+    storage.setItem('email', res.email);
+    storage.setItem('role', res.role);
+    storage.setItem('name', res.name ?? '');
+    storage.setItem('expiry', expiryTime.toString());
+
+    this.startLogoutTimer(expiryTime - Date.now());
+  }
+
+  private getStorage(): Storage | null {
+    return this.isBrowser ? sessionStorage : null;
+  }
+
+  private getTokenExpiryTime(token: string): number {
+    const decoded = jwtDecode<{ exp: number }>(token);
+    return decoded.exp * 1000;
+  }
 }

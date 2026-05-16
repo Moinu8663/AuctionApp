@@ -26,6 +26,7 @@
 .role-badge.all-rounder { background: #ede9fe; color: #6d28d9; }
 .role-badge.wicket-keeper { background: #fef9c3; color: #a16207; }
 .price { font-weight: 600; color: #0f172a; }
+.view-btn { color: var(--app-primary) !important; }
 .edit-btn { color: #6366f1 !important; }
 .delete-btn { color: #dc2626 !important; }
 .empty-cell { text-align: center; padding: 40px; color: #94a3b8; font-size: 0.9rem; }

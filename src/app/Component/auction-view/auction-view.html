@@ -1,0 +1,119 @@
+<div class="view-shell">
+  <div class="view-hero">
+    <div class="hero-avatar">{{ getInitial(auction?.auctionName) }}</div>
+    <div class="hero-copy">
+      <h2>{{ auction?.auctionName }}</h2>
+      <p>{{ auction?.description || 'Auction details and participating teams' }}</p>
+    </div>
+    <span class="status-pill" [class]="getStatusClass()">{{ auction?.status || 'Unknown' }}</span>
+  </div>
+
+  <mat-dialog-content>
+    <div class="summary-strip">
+      <div class="summary-item primary">
+        <mat-icon>account_balance_wallet</mat-icon>
+        <div>
+          <span>Base Budget</span>
+          <strong>Rs {{ auction?.baseBudget | number }}</strong>
+        </div>
+      </div>
+      <div class="summary-item">
+        <mat-icon>event</mat-icon>
+        <div>
+          <span>Date</span>
+          <strong>{{ auction?.auctionDate | date:'mediumDate' }}</strong>
+        </div>
+      </div>
+      <div class="summary-item">
+        <mat-icon>groups</mat-icon>
+        <div>
+          <span>Teams</span>
+          <strong>{{ teams.length }}</strong>
+        </div>
+      </div>
+    </div>
+
+    <div class="auction-detail-grid">
+      <div class="detail-item">
+        <mat-icon>schedule</mat-icon>
+        <span>Start Time</span>
+        <strong>{{ auction?.startTime || '-' }}</strong>
+      </div>
+      <div class="detail-item">
+        <mat-icon>event_available</mat-icon>
+        <span>End Time</span>
+        <strong>{{ auction?.endTime || '-' }}</strong>
+      </div>
+      <div class="detail-item">
+        <mat-icon>person</mat-icon>
+        <span>Created By</span>
+        <strong>{{ auction?.created_By || '-' }}</strong>
+      </div>
+      <div class="detail-item">
+        <mat-icon>calendar_today</mat-icon>
+        <span>Created At</span>
+        <strong>{{ auction?.createdAt || '-' }}</strong>
+      </div>
+      <div class="detail-item">
+        <mat-icon>edit_calendar</mat-icon>
+        <span>Updated At</span>
+        <strong>{{ auction?.updatedAt || '-' }}</strong>
+      </div>
+      <div class="detail-item">
+        <mat-icon>manage_accounts</mat-icon>
+        <span>Updated By</span>
+        <strong>{{ auction?.updated_By || '-' }}</strong>
+      </div>
+    </div>
+
+    <div class="teams-section">
+      <div class="teams-header">
+        <div>
+          <h3>Related Teams</h3>
+          <p>Teams assigned to this auction</p>
+        </div>
+        <span>{{ teams.length }} team{{ teams.length === 1 ? '' : 's' }}</span>
+      </div>
+
+      @if (isLoadingTeams) {
+        <div class="teams-loader"><mat-spinner diameter="34"></mat-spinner></div>
+      }
+
+      @if (!isLoadingTeams) {
+        @if (teams.length) {
+          <div class="team-card-grid">
+            @for (team of teams; track getTeamId(team)) {
+              <div class="team-card">
+                <div class="team-logo">
+                  @if (team.logoUrl) {
+                    <img [src]="team.logoUrl" [alt]="team.teamName">
+                  } @else {
+                    <span>{{ getInitial(team.teamName) }}</span>
+                  }
+                </div>
+                <div class="team-info">
+                  <h4>{{ team.teamName }}</h4>
+                  <p>{{ team.ownerName || 'No owner' }}</p>
+                  <div class="team-meta">
+                    <span><mat-icon>payments</mat-icon> Rs {{ team.purse | number }}</span>
+                    <span><mat-icon>emoji_events</mat-icon> {{ team.auctionName || auction?.auctionName }}</span>
+                  </div>
+                </div>
+              </div>
+            }
+          </div>
+        } @else {
+          <div class="empty-teams">
+            <mat-icon>groups</mat-icon>
+            <strong>No teams found</strong>
+            <span>This auction does not have teams assigned yet.</span>
+          </div>
+        }
+      }
+    </div>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button mat-button (click)="dialogRef.close()">Close</button>
+  </mat-dialog-actions>
+</div>

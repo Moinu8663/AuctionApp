@@ -1,8 +1,14 @@
 @if (isDelete) {
-  <h2 mat-dialog-title>Delete Auction</h2>
-  <mat-dialog-content>
-    <div class="delete-confirm">
-      <div class="delete-avatar">{{ dialogData?.auctionName?.[0]?.toUpperCase() }}</div>
+  <div class="dialog-hero danger">
+    <div class="hero-avatar"><mat-icon>delete</mat-icon></div>
+    <div>
+      <h2>Delete Auction</h2>
+      <p>{{ dialogData?.auctionName }}</p>
+    </div>
+  </div>
+
+  <mat-dialog-content class="delete-content">
+    <div class="delete-confirm">      
       <p>Are you sure you want to delete <strong>{{ dialogData?.auctionName }}</strong>?</p>
       <p class="delete-sub">This action cannot be undone.</p>
       @if (errorMsg) { <div class="error-box"><mat-icon>error</mat-icon> {{ errorMsg }}</div> }
@@ -17,7 +23,14 @@
 }
 
 @if (!isDelete) {
-  <h2 mat-dialog-title>{{ isEdit ? 'Edit Auction' : 'Add Auction' }}</h2>
+  <div class="dialog-hero">
+    <div class="hero-avatar">{{ getInitial(f['auctionName'].value || dialogData?.auctionName) }}</div>
+    <div>
+      <h2>{{ isEdit ? 'Edit Auction' : 'Add Auction' }}</h2>
+      <p>{{ isEdit ? 'Update schedule, budget, and status' : 'Create a new auction with schedule and budget' }}</p>
+    </div>
+  </div>
+
   <mat-dialog-content>
     <ng-container *ngTemplateOutlet="formTpl"></ng-container>
   </mat-dialog-content>
@@ -32,79 +45,103 @@
 <ng-template #formTpl>
   <form [formGroup]="form" class="dialog-form">
 
-    <mat-form-field appearance="outline" class="full-width">
-      <mat-label>Auction Name</mat-label>
-      <input matInput formControlName="auctionName" placeholder="e.g. IPL 2024">
-      <mat-icon matPrefix>event</mat-icon>
-      @if (f['auctionName'].touched && f['auctionName'].hasError('required')) {
-        <mat-error>Auction name is required</mat-error>
-      }
-    </mat-form-field>
+    <div class="form-section">
+      <div class="section-title">
+        <mat-icon>emoji_events</mat-icon>
+        <span>Auction Details</span>
+      </div>
 
-    <mat-form-field appearance="outline" class="full-width">
-      <mat-label>Auction Date</mat-label>
-      <input matInput formControlName="auctionDate" type="date">
-      <mat-icon matPrefix>schedule</mat-icon>
-      @if (f['auctionDate'].touched && f['auctionDate'].hasError('required')) {
-        <mat-error>Duction date is required</mat-error>
-      }
-    </mat-form-field>
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Auction Name</mat-label>
+        <input matInput formControlName="auctionName" placeholder="e.g. IPL 2024">
+        <mat-icon matPrefix>event</mat-icon>
+        @if (f['auctionName'].touched && f['auctionName'].hasError('required')) {
+          <mat-error>Auction name is required</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Description</mat-label>
+        <textarea matInput formControlName="description" rows="3" placeholder="Short auction description"></textarea>
+        <mat-icon matPrefix>notes</mat-icon>
+        @if (f['description'].touched && f['description'].hasError('required')) {
+          <mat-error>Description is required</mat-error>
+        }
+      </mat-form-field>
+    </div>
+
+    <div class="form-section">
+      <div class="section-title">
+        <mat-icon>schedule</mat-icon>
+        <span>Schedule</span>
+      </div>
+
+      <div class="form-grid">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Auction Date</mat-label>
+          <input matInput formControlName="auctionDate" type="date">
+          <mat-icon matPrefix>calendar_today</mat-icon>
+          @if (f['auctionDate'].touched && f['auctionDate'].hasError('required')) {
+            <mat-error>Auction date is required</mat-error>
+          }
+        </mat-form-field>
 
         <mat-form-field appearance="outline" class="full-width">
-      <mat-label>Start Time </mat-label>
-      <mat-select formControlName="startTime">
-        @for (slot of timeSlots; track slot) {
-          <mat-option [value]="slot">{{ slot }}</mat-option>
-        }
-      </mat-select>
-      <mat-icon matPrefix>schedule</mat-icon>
-      @if (f['startTime'].touched && f['startTime'].hasError('required')) {
-        <mat-error>Start Time is required</mat-error>
-      }
-    </mat-form-field>
-    <mat-form-field appearance="outline" class="full-width">
-      <mat-label>End Time </mat-label>
-      <mat-select formControlName="endTime">
-        @for (slot of timeSlots; track slot) {
-          <mat-option [value]="slot">{{ slot }}</mat-option>
-        }
-      </mat-select>
-      <mat-icon matPrefix>event_available</mat-icon>
-      @if (f['endTime'].touched && f['endTime'].hasError('required')) {
-        <mat-error>End Time is required</mat-error>
-      }
-    </mat-form-field>
+          <mat-label>Status</mat-label>
+          <mat-select formControlName="status">
+            <mat-option value="Upcoming">Upcoming</mat-option>
+            <mat-option value="Live">Live</mat-option>
+            <mat-option value="Completed">Completed</mat-option>
+          </mat-select>
+          <mat-icon matPrefix>info</mat-icon>
+          @if (f['status'].touched && f['status'].hasError('required')) {
+            <mat-error>Status is required</mat-error>
+          }
+        </mat-form-field>
 
         <mat-form-field appearance="outline" class="full-width">
-      <mat-label>BaseBudget</mat-label>
-      <input matInput formControlName="baseBudget" placeholder="10000...">
-      <mat-icon matPrefix>calendar_today</mat-icon>
-      @if (f['baseBudget'].touched && f['baseBudget'].hasError('required')) {
-        <mat-error>BaseBudget is required</mat-error>
-      }
-    </mat-form-field>
+          <mat-label>Start Time</mat-label>
+          <mat-select formControlName="startTime">
+            @for (slot of timeSlots; track slot) {
+              <mat-option [value]="slot">{{ slot }}</mat-option>
+            }
+          </mat-select>
+          <mat-icon matPrefix>schedule</mat-icon>
+          @if (f['startTime'].touched && f['startTime'].hasError('required')) {
+            <mat-error>Start time is required</mat-error>
+          }
+        </mat-form-field>
 
-    <mat-form-field appearance="outline" class="full-width">
-      <mat-label>Status</mat-label>
-      <mat-select formControlName="status">
-        <mat-option value="Upcoming">Upcoming</mat-option>
-        <mat-option value="Live">Live</mat-option>
-        <mat-option value="Completed">Completed</mat-option>
-      </mat-select>
-      <mat-icon matPrefix>info</mat-icon>
-      @if (f['status'].touched && f['status'].hasError('required')) {
-        <mat-error>Status is required</mat-error>
-      }
-    </mat-form-field>
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>End Time</mat-label>
+          <mat-select formControlName="endTime">
+            @for (slot of timeSlots; track slot) {
+              <mat-option [value]="slot">{{ slot }}</mat-option>
+            }
+          </mat-select>
+          <mat-icon matPrefix>event_available</mat-icon>
+          @if (f['endTime'].touched && f['endTime'].hasError('required')) {
+            <mat-error>End time is required</mat-error>
+          }
+        </mat-form-field>
+      </div>
+    </div>
 
-            <mat-form-field appearance="outline" class="full-width">
-      <mat-label>Description</mat-label>
-      <input matInput formControlName="description" placeholder="10000...">
-      <mat-icon matPrefix>calendar_today</mat-icon>
-      @if (f['description'].touched && f['description'].hasError('required')) {
-        <mat-error>description is required</mat-error>
-      }
-    </mat-form-field>
+    <div class="form-section">
+      <div class="section-title">
+        <mat-icon>account_balance_wallet</mat-icon>
+        <span>Budget</span>
+      </div>
+
+      <mat-form-field appearance="outline" class="full-width budget-field">
+        <mat-label>Base Budget</mat-label>
+        <input matInput formControlName="baseBudget" type="number" min="0" placeholder="10000">
+        <mat-icon matPrefix>payments</mat-icon>
+        @if (f['baseBudget'].touched && f['baseBudget'].hasError('required')) {
+          <mat-error>Base budget is required</mat-error>
+        }
+      </mat-form-field>
+    </div>
 
     @if (errorMsg) { <div class="error-box"><mat-icon>error</mat-icon> {{ errorMsg }}</div> }
 

@@ -53,6 +53,11 @@ export class AddTeam implements OnInit {
   });
 
   get f() { return this.form.controls; }
+
+  getInitial(value: string | undefined): string {
+    return value?.trim()?.[0]?.toUpperCase() || 'T';
+  }
+
     private get createdBy(): string {
     return isPlatformBrowser(this.platformId) ? (sessionStorage.getItem('email') ?? '') : '';
   }

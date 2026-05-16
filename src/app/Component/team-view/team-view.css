@@ -1,0 +1,130 @@
+.view-shell { background: #ffffff; }
+.view-hero {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 14px;
+  padding: 20px 24px;
+  background: linear-gradient(135deg, #0f172a, #164e63);
+  color: white;
+}
+.hero-logo {
+  width: 58px;
+  height: 58px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255,255,255,0.14);
+  border: 1px solid rgba(255,255,255,0.2);
+  font-size: 1.4rem;
+  font-weight: 800;
+  overflow: hidden;
+}
+.hero-logo img { width: 100%; height: 100%; object-fit: contain; background: white; }
+.hero-copy { min-width: 0; }
+.hero-copy h2 { margin: 0 0 4px; font-size: 1.25rem; font-weight: 800; }
+.hero-copy p { margin: 0; color: #cbd5e1; font-size: 0.86rem; }
+.owner-pill {
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: #dcfce7;
+  color: #15803d;
+  font-size: 0.78rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+.summary-strip {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin: 18px 0;
+}
+.summary-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 14px;
+  background: #f8fafc;
+}
+.summary-item.primary { background: #ecfeff; border-color: #a5f3fc; }
+.summary-item mat-icon { color: var(--app-primary); }
+.summary-item span,
+.detail-item span { display: block; color: #64748b; font-size: 0.74rem; margin-bottom: 4px; text-transform: uppercase; }
+.summary-item strong,
+.detail-item strong { color: #0f172a; font-size: 0.92rem; }
+.detail-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+.detail-item {
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 12px;
+  background: #f8fafc;
+}
+.detail-item mat-icon { color: #6366f1; margin-bottom: 8px; }
+.players-section {
+  border-top: 1px solid #e2e8f0;
+  margin-top: 18px;
+  padding-top: 18px;
+}
+.players-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
+.players-header h3 { margin: 0 0 3px; color: #0f172a; font-size: 1rem; }
+.players-header p { margin: 0; color: #64748b; font-size: 0.82rem; }
+.players-header span { color: #64748b; font-size: 0.82rem; }
+.players-loader { display: flex; justify-content: center; padding: 32px 0; }
+.player-card-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.player-card {
+  display: flex;
+  gap: 12px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 14px;
+  background: white;
+  box-shadow: 0 1px 5px rgba(15, 23, 42, 0.04);
+}
+.player-photo {
+  width: 52px;
+  height: 52px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #eef2ff, #cffafe);
+  color: #4f46e5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+.player-photo img { width: 100%; height: 100%; object-fit: cover; }
+.player-info { min-width: 0; flex: 1; }
+.player-topline { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
+.player-info h4 { margin: 0 0 4px; color: #0f172a; font-size: 0.95rem; }
+.player-info p { margin: 0 0 10px; color: #64748b; font-size: 0.82rem; }
+.role-badge {
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: #eef2ff;
+  color: #4f46e5;
+  font-size: 0.7rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+.player-meta { display: flex; flex-wrap: wrap; gap: 8px; color: #64748b; font-size: 0.76rem; }
+.player-meta span { display: inline-flex; align-items: center; gap: 4px; padding: 4px 8px; border-radius: 999px; background: #f1f5f9; }
+.player-meta mat-icon { font-size: 15px; width: 15px; height: 15px; color: var(--app-primary); }
+.empty-players { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 32px; text-align: center; border: 1px dashed #cbd5e1; border-radius: 8px; color: #94a3b8; }
+.empty-players mat-icon { color: #64748b; }
+.empty-players strong { color: #334155; }
+
+@media (max-width: 768px) {
+  .view-hero,
+  .summary-strip,
+  .detail-grid,
+  .player-card-grid { grid-template-columns: 1fr; }
+  .owner-pill { justify-self: start; }
+}

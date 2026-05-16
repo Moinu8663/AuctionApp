@@ -10,6 +10,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSelectModule } from '@angular/material/select';
 import { MatDialogModule, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { ProfileService } from '../../Services/Profile/ProfileService';
+import { Roleservice } from '../../Services/RoleService/roleservice';
 
 function passwordMatchValidator(control: AbstractControl): ValidationErrors | null {
   const password = control.get('password')?.value;
@@ -37,6 +38,7 @@ function passwordMatchValidator(control: AbstractControl): ValidationErrors | nu
 export class Register {
   private readonly fb = inject(FormBuilder);
   private readonly profileService = inject(ProfileService);
+  private readonly roleservice = inject(Roleservice);
 
   @Optional() dialogRef = inject(MatDialogRef<Register>, { optional: true });
   @Optional() dialogData = inject<any>(MAT_DIALOG_DATA, { optional: true });
@@ -50,6 +52,7 @@ export class Register {
   loading = false;
   errorMsg = '';
   successMsg = '';
+  roles: any[] = [];
 
   registerForm = this.fb.group({
     name:            [this.dialogData?.name   ?? '', [Validators.required, Validators.minLength(3)]],
@@ -61,6 +64,9 @@ export class Register {
   }, { validators: passwordMatchValidator });
 
   get f() { return this.registerForm.controls; }
+    ngOnInit(): void {
+    this.getRoles();
+  }
 
   onDelete(): void {
     this.loading = true;
@@ -80,8 +86,8 @@ export class Register {
     const value = this.registerForm.getRawValue();
 
     const api$ = this.isEdit
-      ? this.profileService.update({ name: value.name, mobile: value.mobile, role: value.role, email: this.dialogData.email })
-      : this.profileService.create({ name: value.name, email: value.email, mobile: value.mobile, role: value.role, password: value.password });
+      ? this.profileService.update({ name: value.name, mobile: value.mobile, RoleId: value.role, email: this.dialogData.email })
+      : this.profileService.create({ name: value.name, email: value.email, mobile: value.mobile, RoleId: value.role, password: value.password });
 
     api$.subscribe({
       next: () => {
@@ -97,6 +103,14 @@ export class Register {
         this.loading = false;
         this.errorMsg = err?.error?.message || 'Operation failed. Please try again.';
       },
+    });
+  }
+  getRoles(){
+    this.roleservice.get({flag : "GET"}).subscribe({
+      next: (res) => {
+        this.roles = res;
+      },
+      error: () => {},
     });
   }
 }

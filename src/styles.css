@@ -1,10 +1,209 @@
-*, *::before, *::after { box-sizing: border-box; }
+:root {
+  --app-primary: #6366f1;
+  --app-primary-strong: #8b5cf6;
+  --app-primary-soft: #eef2ff;
+  --app-accent: #6366f1;
+  --app-danger: #dc2626;
+  --app-bg: #f8fafc;
+  --app-surface: #ffffff;
+  --app-surface-alt: #f1f5f9;
+  --app-border: #e2e8f0;
+  --app-text: #0f172a;
+  --app-muted: #64748b;
+  --app-header-gradient: linear-gradient(135deg, #0f172a, #1e1b4b);
+  --app-action-gradient: linear-gradient(90deg, var(--app-primary), var(--app-primary-strong));
+  --app-danger-gradient: linear-gradient(135deg, #7f1d1d, #991b1b);
+  --app-radius: 8px;
+  --app-shadow: 0 1px 5px rgba(15, 23, 42, 0.06);
+  --app-scrollbar-size: 6px;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  font-family: inherit;
+}
 
 html, body {
   margin: 0;
   padding: 0;
   font-family: 'Inter', sans-serif;
   -webkit-text-size-adjust: 100%;
+  background: var(--app-bg);
+  color: var(--app-text);
+}
+
+html {
+  min-height: 100%;
+}
+
+body {
+  min-height: 100vh;
+  background: var(--app-bg);
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--app-primary) #f1f5f9;
+}
+
+*::-webkit-scrollbar {
+  width: var(--app-scrollbar-size);
+  height: var(--app-scrollbar-size);
+}
+
+*::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 999px;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: var(--app-primary);
+  border-radius: 999px;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: var(--app-primary-strong);
+}
+
+.mat-mdc-progress-spinner circle {
+  stroke: var(--app-primary) !important;
+}
+
+.mat-mdc-dialog-surface {
+  border-radius: var(--app-radius) !important;
+  overflow: hidden !important;
+}
+
+.add-btn,
+.save-btn,
+.register-btn,
+.upload-btn {
+  background: var(--app-action-gradient) !important;
+  color: #ffffff !important;
+  border-radius: var(--app-radius) !important;
+}
+
+.delete-btn {
+  background: transparent !important;
+  color: var(--app-danger) !important;
+  border: 1px solid rgba(220, 38, 38, 0.16) !important;
+  border-radius: var(--app-radius) !important;
+}
+
+.view-btn {
+  color: var(--app-primary) !important;
+}
+
+.edit-btn {
+  color: var(--app-primary-strong) !important;
+}
+
+.mat-mdc-header-row {
+  background: var(--app-header-gradient) !important;
+}
+
+.surface-panel,
+.panel,
+.team-card,
+.player-card,
+.overview-card,
+.stat-card,
+.activity-item,
+.summary-item,
+.detail-item,
+.form-section,
+.mat-mdc-card,
+.mat-mdc-dialog-surface,
+.mat-mdc-form-field-flex,
+.mat-mdc-table,
+.table-wrapper {
+  background: var(--app-surface) !important;
+  color: var(--app-text) !important;
+  border-radius: var(--app-radius) !important;
+  box-shadow: 0 18px 45px rgba(99, 102, 241, 0.08) !important;
+}
+
+.mat-mdc-table,
+.mat-mdc-table .mat-mdc-header-cell,
+.mat-mdc-table .mat-mdc-cell,
+.mat-mdc-table .mat-mdc-row,
+.mat-mdc-table .mat-mdc-header-row {
+  font-family: 'Inter', sans-serif !important;
+  font-size: 0.95rem !important;
+  color: var(--app-text) !important;
+}
+
+.mat-mdc-select-trigger,
+.mat-mdc-select-value,
+.mat-mdc-form-field-flex {
+  background: var(--app-surface) !important;
+}
+.mat-mdc-select-trigger,
+.mat-mdc-select-value,
+.mat-mdc-form-field-flex,
+.mat-mdc-form-field,
+.mat-mdc-form-field-wrapper,
+.mat-mdc-input-element,
+input,
+textarea,
+select,
+label,
+.mat-form-field-label,
+.mat-mdc-form-field-infix {
+  background: var(--app-surface) !important;
+  font-family: 'Inter', sans-serif !important;
+  font-size: 0.95rem !important;
+  color: var(--app-text) !important;
+}
+
+.mat-mdc-button.mat-primary,
+.mat-mdc-button.mat-accent,
+.add-btn,
+.save-btn,
+.register-btn,
+.upload-btn {
+  background: var(--app-action-gradient) !important;
+  color: #ffffff !important;
+}
+.mat-mdc-button.mat-primary,
+.mat-mdc-button.mat-accent,
+.add-btn,
+.save-btn,
+.register-btn,
+.upload-btn {
+  background: var(--app-action-gradient) !important;
+  color: #ffffff !important;
+}
+
+.table-wrapper,
+.panel,
+.stat-card,
+.activity-item,
+.team-card,
+.player-card,
+.overview-card,
+.form-section,
+.detail-item,
+.summary-item {
+  border-radius: var(--app-radius) !important;
+}
+
+.table-wrapper::-webkit-scrollbar-thumb,
+.player-card-grid::-webkit-scrollbar-thumb,
+.content::-webkit-scrollbar-thumb,
+aside::-webkit-scrollbar-thumb,
+mat-dialog-content::-webkit-scrollbar-thumb {
+  background: var(--app-primary) !important;
+}
+
+.dialog-hero,
+.view-hero,
+.dashboard-hero {
+  background: var(--app-header-gradient) !important;
+}
+
+.dialog-hero.danger {
+  background: var(--app-danger-gradient) !important;
 }
 
 /* Responsive mat-dialog on small screens */
@@ -13,7 +212,6 @@ html, body {
     max-width: 100vw !important;
     width: 100vw !important;
     margin: 0 !important;
-    border-radius: 16px 16px 0 0 !important;
   }
   .cdk-overlay-pane {
     max-width: 100vw !important;

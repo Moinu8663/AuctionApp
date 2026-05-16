@@ -1,9 +1,14 @@
-<!-- DELETE MODE -->
 @if (isDelete) {
-  <h2 mat-dialog-title>Delete Team</h2>
-  <mat-dialog-content>
+  <div class="dialog-hero danger">
+    <div class="hero-avatar"><mat-icon>delete</mat-icon></div>
+    <div>
+      <h2>Delete Team</h2>
+      <p>{{ dialogData?.teamName }}</p>
+    </div>
+  </div>
+
+  <mat-dialog-content class="delete-content">
     <div class="delete-confirm">
-      <div class="delete-avatar">{{ dialogData?.teamName?.[0]?.toUpperCase() }}</div>
       <p>Are you sure you want to delete <strong>{{ dialogData?.teamName }}</strong>?</p>
       <p class="delete-sub">This action cannot be undone.</p>
       @if (errorMsg) {
@@ -19,53 +24,97 @@
   </mat-dialog-actions>
 }
 
-<!-- ADD / EDIT MODE -->
 @if (!isDelete) {
-  <h2 mat-dialog-title>{{ isEdit ? 'Edit Team' : 'Add Team' }}</h2>
+  <div class="dialog-hero">
+    <div class="hero-avatar">
+      @if (logoPreview) {
+        <img [src]="logoPreview" alt="Team Logo">
+      } @else {
+        <span>{{ getInitial(f['teamName'].value || dialogData?.teamName) }}</span>
+      }
+    </div>
+    <div>
+      <h2>{{ isEdit ? 'Edit Team' : 'Add Team' }}</h2>
+      <p>{{ isEdit ? 'Update team details and auction purse' : 'Create a team for an auction' }}</p>
+    </div>
+  </div>
 
   <mat-dialog-content>
     <form [formGroup]="form" class="dialog-form">
 
-      <mat-form-field appearance="outline" class="full-width">
-        <mat-label>Auction</mat-label>
-        <mat-select formControlName="auctionId">
-          @for (auction of auctions; track auction.auctionId) {
-            <mat-option [value]="auction.auctionId">{{ auction.auctionName }}</mat-option>
-          }
-        </mat-select>
-        <mat-icon matPrefix>event</mat-icon>
-        @if (f['auctionId'].touched && f['auctionId'].hasError('required')) {
-          <mat-error>Auction is required</mat-error>
-        }
-      </mat-form-field>
+      <div class="form-section">
+        <div class="section-title">
+          <mat-icon>groups</mat-icon>
+          <span>Team Details</span>
+        </div>
 
-      <mat-form-field appearance="outline" class="full-width">
-        <mat-label>Team Name</mat-label>
-        <input matInput formControlName="teamName" placeholder="e.g. Mumbai Indians">
-        <mat-icon matPrefix>groups</mat-icon>
-        @if (f['teamName'].touched && f['teamName'].hasError('required')) {
-          <mat-error>Team name is required</mat-error>
-        }
-        @if (f['teamName'].touched && f['teamName'].hasError('minlength')) {
-          <mat-error>Minimum 2 characters</mat-error>
-        }
-      </mat-form-field>
+        <div class="form-grid">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Team Name</mat-label>
+            <input matInput formControlName="teamName" placeholder="e.g. Mumbai Indians">
+            <mat-icon matPrefix>groups</mat-icon>
+            @if (f['teamName'].touched && f['teamName'].hasError('required')) {
+              <mat-error>Team name is required</mat-error>
+            }
+            @if (f['teamName'].touched && f['teamName'].hasError('minlength')) {
+              <mat-error>Minimum 2 characters</mat-error>
+            }
+          </mat-form-field>
 
-      <mat-form-field appearance="outline" class="full-width">
-        <mat-label>Owner Name</mat-label>
-        <input matInput formControlName="ownerName" placeholder="e.g. MI">
-        <mat-icon matPrefix>label</mat-icon>
-        @if (f['ownerName'].touched && f['ownerName'].hasError('required')) {
-          <mat-error>Owner name is required</mat-error>
-        }
-        @if (f['ownerName'].touched && f['ownerName'].hasError('maxlength')) {
-          <mat-error>Maximum 5 characters</mat-error>
-        }
-      </mat-form-field>
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Owner Name</mat-label>
+            <input matInput formControlName="ownerName" placeholder="e.g. Reliance Industries">
+            <mat-icon matPrefix>person</mat-icon>
+            @if (f['ownerName'].touched && f['ownerName'].hasError('required')) {
+              <mat-error>Owner name is required</mat-error>
+            }
+            @if (f['ownerName'].touched && f['ownerName'].hasError('minlength')) {
+              <mat-error>Minimum 5 characters</mat-error>
+            }
+          </mat-form-field>
+        </div>
+      </div>
 
-      <!-- Team Logo Upload -->
-      <div class="logo-upload">
-        <label class="logo-label">Team Logo</label>
+      <div class="form-section">
+        <div class="section-title">
+          <mat-icon>emoji_events</mat-icon>
+          <span>Auction & Purse</span>
+        </div>
+
+        <div class="form-grid">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Auction</mat-label>
+            <mat-select formControlName="auctionId">
+              @for (auction of auctions; track auction.auctionId) {
+                <mat-option [value]="auction.auctionId">{{ auction.auctionName }}</mat-option>
+              }
+            </mat-select>
+            <mat-icon matPrefix>event</mat-icon>
+            @if (f['auctionId'].touched && f['auctionId'].hasError('required')) {
+              <mat-error>Auction is required</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Purse</mat-label>
+            <input matInput formControlName="purse" type="number" placeholder="e.g. 9000000">
+            <mat-icon matPrefix>payments</mat-icon>
+            @if (f['purse'].touched && f['purse'].hasError('required')) {
+              <mat-error>Purse is required</mat-error>
+            }
+            @if (f['purse'].touched && f['purse'].hasError('min')) {
+              <mat-error>Purse must be greater than 0</mat-error>
+            }
+          </mat-form-field>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <div class="section-title">
+          <mat-icon>image</mat-icon>
+          <span>Team Logo</span>
+        </div>
+
         <div class="logo-row">
           @if (logoPreview) {
             <img [src]="logoPreview" class="logo-preview" alt="Team Logo" />
@@ -82,18 +131,6 @@
           </label>
         </div>
       </div>
-
-      <mat-form-field appearance="outline" class="full-width">
-        <mat-label>Purse (₹)</mat-label>
-        <input matInput formControlName="purse" type="number" placeholder="e.g. 9000000">
-        <mat-icon matPrefix>currency_rupee</mat-icon>
-        @if (f['purse'].touched && f['purse'].hasError('required')) {
-          <mat-error>Purse is required</mat-error>
-        }
-        @if (f['purse'].touched && f['purse'].hasError('min')) {
-          <mat-error>Purse must be greater than 0</mat-error>
-        }
-      </mat-form-field>
 
       @if (errorMsg) {
         <div class="error-box"><mat-icon>error</mat-icon> {{ errorMsg }}</div>

@@ -65,6 +65,10 @@ export class AddAuction {
 
   get f() { return this.form.controls; }
 
+  getInitial(value: string | undefined): string {
+    return value?.trim()?.[0]?.toUpperCase() || 'A';
+  }
+
   onSubmit(): void {
     if (this.form.invalid) return;
     this.loading = true;

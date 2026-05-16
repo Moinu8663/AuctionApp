@@ -13,7 +13,7 @@ html {
         primary: mat.$azure-palette,
         tertiary: mat.$blue-palette,
       ),
-      typography: Roboto,
+      typography: Inter,
       density: 0,
     )
   );
@@ -34,5 +34,5 @@ body {
 
   // Reset the user agent margin.
   margin: 0;
-  height: 90%;
+  min-height: 100%;
 }

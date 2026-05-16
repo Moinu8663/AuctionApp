@@ -1,0 +1,94 @@
+<div class="view-shell">
+  <div class="view-hero">
+    <div class="hero-photo">
+      @if (player?.picUrl) {
+        <img [src]="player.picUrl" [alt]="player.playerName">
+      } @else {
+        <span>{{ getInitial(player?.playerName) }}</span>
+      }
+    </div>
+    <div class="hero-copy">
+      <h2>{{ player?.playerName }}</h2>
+      <p>{{ player?.role || 'Player' }} @if (player?.country) { <span> | {{ player.country }}</span> }</p>
+    </div>
+    <span class="status-pill" [class.sold]="player?.isSold">{{ getSoldLabel() }}</span>
+  </div>
+
+  <mat-dialog-content>
+    <div class="summary-strip">
+      <div class="summary-item primary">
+        <mat-icon>sell</mat-icon>
+        <div>
+          <span>Base Price</span>
+          <strong>Rs {{ player?.basePrice | number }}</strong>
+        </div>
+      </div>
+      <div class="summary-item">
+        <mat-icon>payments</mat-icon>
+        <div>
+          <span>Sold Price</span>
+          <strong>Rs {{ player?.soldPrice | number }}</strong>
+        </div>
+      </div>
+      <div class="summary-item">
+        <mat-icon>cake</mat-icon>
+        <div>
+          <span>Age</span>
+          <strong>{{ player?.age || '-' }}</strong>
+        </div>
+      </div>
+    </div>
+
+    <div class="detail-grid">
+      <div class="detail-item">
+        <mat-icon>emoji_events</mat-icon>
+        <span>Auction</span>
+        <strong>{{ player?.auctionName || '-' }}</strong>
+      </div>
+      <div class="detail-item">
+        <mat-icon>groups</mat-icon>
+        <span>Team</span>
+        <strong>{{ player?.teamName || '-' }}</strong>
+      </div>
+      <div class="detail-item">
+        <mat-icon>sports_cricket</mat-icon>
+        <span>Role</span>
+        <strong>{{ player?.role || '-' }}</strong>
+      </div>
+      <div class="detail-item">
+        <mat-icon>flag</mat-icon>
+        <span>Country</span>
+        <strong>{{ player?.country || '-' }}</strong>
+      </div>
+      <div class="detail-item">
+        <mat-icon>phone</mat-icon>
+        <span>Mobile</span>
+        <strong>{{ player?.mobile || '-' }}</strong>
+      </div>
+      <div class="detail-item">
+        <mat-icon>email</mat-icon>
+        <span>Email</span>
+        <strong>{{ player?.email || '-' }}</strong>
+      </div>
+      <div class="detail-item">
+        <mat-icon>calendar_today</mat-icon>
+        <span>Created At</span>
+        <strong>{{ player?.createdAt || '-' }}</strong>
+      </div>
+      <div class="detail-item">
+        <mat-icon>person_add</mat-icon>
+        <span>Created By</span>
+        <strong>{{ player?.created_By || '-' }}</strong>
+      </div>
+      <div class="detail-item">
+        <mat-icon>edit_calendar</mat-icon>
+        <span>Updated At</span>
+        <strong>{{ player?.updatedAt || '-' }}</strong>
+      </div>
+    </div>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button mat-button (click)="dialogRef.close()">Close</button>
+  </mat-dialog-actions>
+</div>

@@ -1,0 +1,122 @@
+<div class="view-shell">
+  <div class="view-hero">
+    <div class="hero-logo">
+      @if (team?.logoUrl) {
+        <img [src]="team.logoUrl" [alt]="team.teamName">
+      } @else {
+        <span>{{ getInitial(team?.teamName) }}</span>
+      }
+    </div>
+    <div class="hero-copy">
+      <h2>{{ team?.teamName }}</h2>
+      <p>{{ team?.auctionName || 'Auction team details' }}</p>
+    </div>
+    <span class="owner-pill">{{ team?.ownerName || 'No owner' }}</span>
+  </div>
+
+  <mat-dialog-content>
+    <div class="summary-strip">
+      <div class="summary-item primary">
+        <mat-icon>account_balance_wallet</mat-icon>
+        <div>
+          <span>Purse</span>
+          <strong>Rs {{ team?.purse | number }}</strong>
+        </div>
+      </div>
+      <div class="summary-item">
+        <mat-icon>emoji_events</mat-icon>
+        <div>
+          <span>Auction</span>
+          <strong>{{ team?.auctionName || '-' }}</strong>
+        </div>
+      </div>
+    </div>
+
+    <div class="detail-grid">
+      <div class="detail-item">
+        <mat-icon>groups</mat-icon>
+        <span>Team Name</span>
+        <strong>{{ team?.teamName || '-' }}</strong>
+      </div>
+      <div class="detail-item">
+        <mat-icon>person</mat-icon>
+        <span>Owner</span>
+        <strong>{{ team?.ownerName || '-' }}</strong>
+      </div>
+      <div class="detail-item">
+        <mat-icon>calendar_today</mat-icon>
+        <span>Created At</span>
+        <strong>{{ team?.createdAt || '-' }}</strong>
+      </div>
+      <div class="detail-item">
+        <mat-icon>person_add</mat-icon>
+        <span>Created By</span>
+        <strong>{{ team?.created_By || '-' }}</strong>
+      </div>
+      <div class="detail-item">
+        <mat-icon>edit_calendar</mat-icon>
+        <span>Updated At</span>
+        <strong>{{ team?.updatedAt || '-' }}</strong>
+      </div>
+      <div class="detail-item">
+        <mat-icon>manage_accounts</mat-icon>
+        <span>Updated By</span>
+        <strong>{{ team?.updated_By || '-' }}</strong>
+      </div>
+    </div>
+
+    <div class="players-section">
+      <div class="players-header">
+        <div>
+          <h3>Related Players</h3>
+          <p>Players assigned to this team</p>
+        </div>
+        <span>{{ players.length }} player{{ players.length === 1 ? '' : 's' }}</span>
+      </div>
+
+      @if (isLoadingPlayers) {
+        <div class="players-loader"><mat-spinner diameter="34"></mat-spinner></div>
+      }
+
+      @if (!isLoadingPlayers) {
+        @if (players.length) {
+          <div class="player-card-grid">
+            @for (player of players; track getPlayerId(player)) {
+              <div class="player-card">
+                <div class="player-photo">
+                  @if (player.picUrl) {
+                    <img [src]="player.picUrl" [alt]="player.playerName">
+                  } @else {
+                    <span>{{ getInitial(player.playerName) }}</span>
+                  }
+                </div>
+                <div class="player-info">
+                  <div class="player-topline">
+                    <h4>{{ player.playerName }}</h4>
+                    <span class="role-badge">{{ player.role || 'Player' }}</span>
+                  </div>
+                  <p>{{ player.country || 'No country' }} @if (player.age) { <span> | {{ player.age }} yrs</span> }</p>
+                  <div class="player-meta">
+                    <span><mat-icon>sell</mat-icon> Base Rs {{ player.basePrice | number }}</span>
+                    <span><mat-icon>payments</mat-icon> Sold Rs {{ player.soldPrice | number }}</span>
+                    <span><mat-icon>check_circle</mat-icon> {{ player.isSold ? 'Sold' : 'Available' }}</span>
+                  </div>
+                </div>
+              </div>
+            }
+          </div>
+        } @else {
+          <div class="empty-players">
+            <mat-icon>person_search</mat-icon>
+            <strong>No players found</strong>
+            <span>This team does not have players assigned yet.</span>
+          </div>
+        }
+      }
+    </div>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button mat-button (click)="dialogRef.close()">Close</button>
+  </mat-dialog-actions>
+</div>

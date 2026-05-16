@@ -8,7 +8,7 @@
 /* ===== LEFT PANEL ===== */
 .illustration-panel {
   flex: 1;
-  background: linear-gradient(135deg, #2563eb, #0ea5e9);
+  background: var(--app-action-gradient);
   position: relative;
   overflow: hidden;
   display: flex;
@@ -107,7 +107,7 @@
   height: 45px;
   border-radius: 10px;
   font-weight: 600;
-  background: linear-gradient(90deg, #2563eb, #3b82f6);
+  background: var(--app-action-gradient);
   color: white;
   transition: 0.3s;
   margin-top: 4px;
@@ -152,7 +152,7 @@
 }
 
 .login-link a {
-  color: #2563eb;
+  color: var(--app-primary-strong);
   font-weight: 600;
   text-decoration: none;
 }
@@ -188,7 +188,7 @@
   width: 64px;
   height: 64px;
   border-radius: 50%;
-  background: #fee2e2;
+  background: transparent;
   color: #dc2626;
   font-size: 1.6rem;
   font-weight: 700;
@@ -196,6 +196,7 @@
   align-items: center;
   justify-content: center;
   margin-bottom: 16px;
+  border: 1px solid rgba(220, 38, 38, 0.16);
 }
 
 .delete-confirm p {
@@ -211,8 +212,9 @@
 }
 
 .delete-btn {
-  background: #fee2e2;
+  background: transparent;
   color: #dc2626;
+  border: 1px solid rgba(220, 38, 38, 0.16);
   border-radius: 8px;
 }
 

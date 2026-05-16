@@ -22,6 +22,12 @@ export const routes: Routes = [
         loadComponent: () => import('./Component/home/home').then(m => m.Home)
       },
       {
+        path: 'dashboard',
+        canActivate: [roleGuard],
+        data: { roles: ['Admin', 'User', 'SuperAdmin'] },
+        loadComponent: () => import('./Component/dashboard/dashboard').then(m => m.Dashboard)
+      },
+      {
         path: 'profile',
         canActivate: [roleGuard],
         data: { roles: ['Admin', 'User', 'SuperAdmin'] },
@@ -50,6 +56,18 @@ export const routes: Routes = [
         canActivate: [roleGuard],
         data: { roles: ['SuperAdmin', 'Admin'] },
         loadComponent: () => import('./Component/auction-panel/auction-panel').then(m => m.AuctionPanel)
+      },
+      {
+        path: 'menu-access-panel',
+        canActivate: [roleGuard],
+        data: { roles: ['SuperAdmin'] },
+        loadComponent: () => import('./Component/menu-access-panel/menu-access-panel').then(m => m.MenuAccessPanel)
+      },
+      {
+        path: 'menu-panel',
+        canActivate: [roleGuard],
+        data: { roles: ['SuperAdmin'] },
+        loadComponent: () => import('./Component/menu-panel/menu-panel').then(m => m.MenuPanel)
       },
     ]
   }

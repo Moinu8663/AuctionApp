@@ -1,6 +1,6 @@
 import { DecimalPipe } from '@angular/common';
-import { Component, inject, ChangeDetectionStrategy, ChangeDetectorRef, OnDestroy } from '@angular/core';
-import { MatTableModule } from '@angular/material/table';
+import { Component, inject, ChangeDetectionStrategy, ChangeDetectorRef, OnDestroy, ViewChild } from '@angular/core';
+import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDialogModule, MatDialog } from '@angular/material/dialog';
@@ -10,13 +10,15 @@ import { TeamService } from '../../Services/TeamService/team-service';
 import { AddTeam } from '../add-team/add-team';
 import { Subject, takeUntil } from 'rxjs';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
+import { TeamView } from '../team-view/team-view';
 
 
 @Component({
   selector: 'app-team-panel',
   imports: [
     MatTableModule, MatButtonModule, MatIconModule,
-    MatDialogModule, MatProgressSpinnerModule, MatTooltipModule,
+    MatDialogModule, MatProgressSpinnerModule, MatTooltipModule,MatPaginatorModule
   ],
   templateUrl: './team-panel.html',
   styleUrl: './team-panel.css',
@@ -29,11 +31,21 @@ export class TeamPanel implements OnDestroy {
   private readonly destroy$ = new Subject<void>();
   private readonly snckbar = inject(MatSnackBar);
 
-  displayedColumns = ['no', 'teamName', 'ownerName', 'logoUrl', 'auctionId', 'purse', 'createdBy', 'createdAt', 'updatedBy', 'updatedAt', 'actions'];
-  teams: any[] = [];
+  @ViewChild(MatPaginator) paginator!: MatPaginator;
+
+
+  displayedColumns = ['no', 'teamName', 'ownerName', 'logoUrl', 'auctionName', 'purse', 'createdBy', 'createdAt', 'updatedBy', 'updatedAt', 'actions'];
+  dataSource = new MatTableDataSource<any>([]);
+
   isLoading = false;
 
-  ngOnInit(): void { this.loadTeams(); }
+  ngOnInit(): void {
+    this.loadTeams();
+  }
+
+  ngAfterViewInit(): void {
+    this.dataSource.paginator = this.paginator;
+  }
 
   ngOnDestroy(): void { this.destroy$.next(); this.destroy$.complete(); }
 
@@ -45,7 +57,14 @@ export class TeamPanel implements OnDestroy {
     this.teamService.get(obj).pipe(takeUntil(this.destroy$)).subscribe({
       next: (res) => { 
         if(res != "teams not found" ){
-          this.teams = res; this.isLoading = false; this.cdr.markForCheck();
+          this.dataSource.data = res;
+          this.isLoading = false;
+
+          if (this.paginator) {
+            this.dataSource.paginator = this.paginator;
+          }
+
+            this.cdr.markForCheck();
         }
         else{
           this.snckbar.open(res, 'ok',{
@@ -59,13 +78,21 @@ export class TeamPanel implements OnDestroy {
   }
 
   openAdd(): void {
-    this.dialog.open(AddTeam, { data: null, width: '460px' })
+    this.dialog.open(AddTeam, { data: null, width: '720px', maxWidth: '95vw' })
       .afterClosed().subscribe(result => { if (result) this.loadTeams(); });
   }
 
   openEdit(team: any): void {
-    this.dialog.open(AddTeam, { data: { ...team, mode: 'edit' }, width: '460px' })
+    this.dialog.open(AddTeam, { data: { ...team, mode: 'edit' }, width: '720px', maxWidth: '95vw' })
       .afterClosed().subscribe(result => { if (result) this.loadTeams(); });
+  }
+
+  openView(team: any): void {
+    this.dialog.open(TeamView, {
+      data: team,
+      width: '680px',
+      maxWidth: '95vw',
+    });
   }
 
   openDelete(team: any): void {

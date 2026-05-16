@@ -1,4 +1,3 @@
-import { NgClass } from '@angular/common';
 import { Component, inject } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
 import { Login } from '../../Services/Login/login';
@@ -6,6 +5,7 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDividerModule } from '@angular/material/divider';
+import { MenuAccessService } from '../../Services/MenuAccessService/menu-access-service';
 
 export interface MenuItem {
   name: string;
@@ -24,6 +24,7 @@ export interface MenuItem {
 export class Layout {
   private readonly login = inject(Login);
   private readonly router = inject(Router);
+  private readonly menuaccessservice = inject(MenuAccessService)
 
   isSidebarVisible = true;
   isMobileOpen = false;
@@ -34,27 +35,16 @@ export class Layout {
   username = '';
   role = '';
 
-  menus: MenuItem[] = [
-    { name: 'Home', icon: '🏠', route: '/home', roles: ['SuperAdmin', 'Admin', 'User'] },
-    {
-      name: 'Management', icon: '⚙️', roles: ['SuperAdmin', 'Admin'],
-      children: [
-        { name: 'Admin Panel',   icon: '🛡️', route: '/adminpanel',    roles: ['SuperAdmin'] },
-        { name: 'Auction Panel', icon: '🔨', route: '/auction-panel', roles: ['SuperAdmin', 'Admin'] },
-        { name: 'Team Panel',    icon: '🏏', route: '/team-panel',    roles: ['SuperAdmin', 'Admin'] },
-        { name: 'Player Panel',  icon: '🧑', route: '/player-panel',  roles: ['SuperAdmin', 'Admin'] },
-      ]
-    },
-    { name: 'My Bids', icon: '💰', route: '/my-bids', roles: ['User'] },
-  ];
+  menus: MenuItem[] = [];
 
   expandedMenus = new Set<string>();
 
   ngOnInit() {
     if (typeof window !== 'undefined') {
-      this.username = sessionStorage.getItem('email') || 'User';
+      this.username = sessionStorage.getItem('name') || 'User';
       this.role = sessionStorage.getItem('role') || '';
     }
+    this.GetRoleMenu();
   }
 
   hasRole(allowedRoles: string[]): boolean {
@@ -77,6 +67,37 @@ export class Layout {
     } else {
       this.isSidebarVisible = !this.isSidebarVisible;
     }
+  }
+
+  GetRoleMenu(){
+    this.menuaccessservice.getById({ RoleName: this.role}).subscribe({
+      next: (res) => { 
+      const parentMenus = res
+        .filter((x: any) => x.parentMenuId === 0)
+        .map((parent: any) => {
+
+          const children = res
+            .filter((c: any) => c.parentMenuId === parent.menuId)
+            .map((child: any) => ({
+              name: child.menuName,
+              icon: child.icon,
+              route: child.routeUrl,
+              roles: [child.roleName]
+            }));
+
+          return {
+            name: parent.menuName,
+            icon: parent.icon,
+            route: parent.routeUrl,
+            roles: [parent.roleName],
+            children: children.length > 0 ? children : undefined
+          };
+        });
+
+      this.menus = parentMenus;
+       },
+      error: (err) => {  },
+    });
   }
 
   closeMobileSidebar() { this.isMobileOpen = false; }

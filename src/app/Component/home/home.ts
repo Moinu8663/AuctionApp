@@ -36,7 +36,7 @@ export class Home {
 
   ngOnInit() {
     if (typeof window !== 'undefined') {
-      this.username = sessionStorage.getItem('username') || 'User';
+      this.username = sessionStorage.getItem('name') || 'User';
     }
     this.checkMpin();
     this.loadActivity();

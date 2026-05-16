@@ -21,7 +21,7 @@
   <!-- Table -->
   @if (!isLoading) {
     <div class="table-wrapper">
-      <table mat-table [dataSource]="teams" class="team-table">
+      <table mat-table [dataSource]="dataSource" class="team-table">
 
         <!-- No -->
         <ng-container matColumnDef="no">
@@ -61,9 +61,9 @@
         </ng-container>
 
         <!-- AuctionId -->
-        <ng-container matColumnDef="auctionId">
-          <th mat-header-cell *matHeaderCellDef>AuctionId</th>
-          <td mat-cell *matCellDef="let row">{{ row.auctionId }}</td>
+        <ng-container matColumnDef="auctionName">
+          <th mat-header-cell *matHeaderCellDef>Auction Name</th>
+          <td mat-cell *matCellDef="let row">{{ row.auctionName }}</td>
         </ng-container>
 
                 <!-- Purse -->
@@ -73,22 +73,22 @@
         </ng-container>
                 <!-- CreatedBy -->
         <ng-container matColumnDef="createdBy">
-          <th mat-header-cell *matHeaderCellDef>CreatedBy</th>
-          <td mat-cell *matCellDef="let row">{{ row.createdBy }}</td>
+          <th mat-header-cell *matHeaderCellDef>Created By</th>
+          <td mat-cell *matCellDef="let row">{{ row.created_By }}</td>
         </ng-container>
                 <!-- CreatedAt -->
         <ng-container matColumnDef="createdAt">
-          <th mat-header-cell *matHeaderCellDef>CreatedAt</th>
+          <th mat-header-cell *matHeaderCellDef>Created At</th>
           <td mat-cell *matCellDef="let row">{{ row.createdAt }}</td>
         </ng-container>
                 <!-- UpdatedBy -->
         <ng-container matColumnDef="updatedBy">
-          <th mat-header-cell *matHeaderCellDef>UpdatedBy</th>
-          <td mat-cell *matCellDef="let row">{{ row.updatedBy }}</td>
+          <th mat-header-cell *matHeaderCellDef>Updated By</th>
+          <td mat-cell *matCellDef="let row">{{ row.updated_By }}</td>
         </ng-container>
                 <!-- UpdatedAt -->
         <ng-container matColumnDef="updatedAt">
-          <th mat-header-cell *matHeaderCellDef>UpdatedAt</th>
+          <th mat-header-cell *matHeaderCellDef>Updated At</th>
           <td mat-cell *matCellDef="let row">{{ row.updatedAt }}</td>
         </ng-container>
 
@@ -96,6 +96,9 @@
         <ng-container matColumnDef="actions">
           <th mat-header-cell *matHeaderCellDef>Actions</th>
           <td mat-cell *matCellDef="let row">
+            <button mat-icon-button class="view-btn" matTooltip="View" (click)="openView(row)">
+              <mat-icon>visibility</mat-icon>
+            </button>
             <button mat-icon-button class="edit-btn" matTooltip="Edit" (click)="openEdit(row)">
               <mat-icon>edit</mat-icon>
             </button>
@@ -114,6 +117,11 @@
 
       </table>
     </div>
+      <mat-paginator
+    [pageSize]="5"
+    [pageSizeOptions]="[5, 10, 20, 50]"
+    showFirstLastButtons>
+  </mat-paginator>
   }
 
 </div>

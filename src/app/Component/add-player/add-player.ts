@@ -67,6 +67,10 @@ export class AddPlayer implements OnInit {
 
   get f() { return this.form.controls; }
 
+  getInitial(value: string | undefined): string {
+    return value?.trim()?.[0]?.toUpperCase() || 'P';
+  }
+
   ngOnInit(): void {
     this.auctionService.get({ flag: 'GET' }).subscribe({
       next: (res) => { this.auctions = res; }
@@ -93,7 +97,6 @@ export class AddPlayer implements OnInit {
       this.blobService.uploadImage(this.selectedFile).subscribe({
         next: (res) => {
           this.uploading = false;
-          console.log(res);
           this.form.patchValue({ picUrl: res.url ?? res });
           this.savePlayer();
         },

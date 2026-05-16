@@ -16,11 +16,9 @@
 
       <nav>
         @for (menu of menus; track menu.name) {
-          @if (hasRole(menu.roles)) {
-
             @if (menu.children) {
               <div class="menu-parent" (click)="toggleExpand(menu.name)">
-                <span>{{ menu.icon }}</span>
+                <mat-icon matPrefix>{{ menu.icon }}</mat-icon>
                 <span class="menu-parent-name">{{ menu.name }}</span>
                 <span class="chevron" [class.open]="isExpanded(menu.name)">›</span>
               </div>
@@ -29,7 +27,7 @@
                   @for (child of menu.children; track child.name) {
                     @if (hasRole(child.roles)) {
                       <a [routerLink]="child.route" routerLinkActive="active" class="menu-child" (click)="closeMobileSidebar()">
-                        <span>{{ child.icon }}</span>
+                        <mat-icon matPrefix>{{ child.icon }}</mat-icon>
                         <span>{{ child.name }}</span>
                       </a>
                     }
@@ -40,14 +38,17 @@
 
             @if (!menu.children) {
               <a [routerLink]="menu.route" routerLinkActive="active" (click)="closeMobileSidebar()">
-                <span>{{ menu.icon }}</span>
+                <mat-icon matPrefix>{{ menu.icon }}</mat-icon>
                 <span>{{ menu.name }}</span>
               </a>
             }
-
-          }
         }
       </nav>
+
+      <button mat-button class="sidebar-logout" (click)="Logout()">
+        <mat-icon>logout</mat-icon>
+        <span>Logout</span>
+      </button>
 
     </aside>
   }
@@ -63,25 +64,8 @@
       <span class="spacer"></span>
 
       <div class="profile-section">
-        <button mat-icon-button [matMenuTriggerFor]="profileMenu">
-          <mat-icon>account_circle</mat-icon>
-        </button>
-
-        <mat-menu #profileMenu="matMenu">
-          <div class="user-info">
-            <strong>{{ username }}</strong>
-            <div style="font-size:12px; opacity:0.6;">{{ role }}</div>
-          </div>
-          <mat-divider></mat-divider>
-          <button mat-menu-item (click)="profile()">
-            <mat-icon>person</mat-icon>
-            <span>Profile</span>
-          </button>
-          <button mat-menu-item (click)="Logout()">
-            <mat-icon>logout</mat-icon>
-            <span>Logout</span>
-          </button>
-        </mat-menu>
+        <mat-icon>account_circle</mat-icon>
+        <strong>{{ username }}</strong>
       </div>
     </header>
 

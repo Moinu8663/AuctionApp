@@ -1,0 +1,20 @@
+.loader { display: flex; justify-content: center; padding: 48px 0; }
+::ng-deep .loader .mat-mdc-progress-spinner circle { stroke: #6366f1; }
+.table-wrapper { max-height: 58vh; overflow: auto; border: 1px solid #e2e8f0; border-radius: 8px; }
+.access-table { width: max-content; min-width: 100%; }
+.mat-mdc-header-row { background: #0f172a; }
+.mat-mdc-header-cell { color: #cbd5f5 !important; font-size: 0.78rem; font-weight: 700; text-transform: uppercase; border: none !important; }
+.mat-mdc-cell { font-size: 0.86rem; color: #334155; border-bottom: 1px solid #f1f5f9 !important; }
+.menu-cell { display: flex; align-items: center; gap: 8px; min-width: 160px; }
+.menu-cell mat-icon { color: #6366f1; }
+.access-badge { display: inline-flex; align-items: center; min-width: 86px; justify-content: center; padding: 4px 10px; border-radius: 999px; background: #fee2e2; color: #b91c1c; font-size: 0.76rem; font-weight: 700; }
+.access-badge.active { background: #dcfce7; color: #15803d; }
+.add-btn, .remove-btn { min-width: 136px; justify-content: center; gap: 6px; }
+.add-btn { background: #4f46e5 !important; color: white !important; }
+.remove-btn { color: #dc2626 !important; border-color: #fecaca !important; }
+.error-box { display: flex; align-items: center; gap: 8px; padding: 10px 12px; margin-bottom: 12px; border-radius: 8px; background: #fee2e2; color: #b91c1c; font-size: 0.85rem; }
+.empty-cell { text-align: center; padding: 36px; color: #94a3b8; }
+
+@media (max-width: 768px) {
+  .table-wrapper { max-height: 62vh; }
+}

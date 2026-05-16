@@ -143,6 +143,7 @@
 }
 
 /* ===== ACTION BUTTONS ===== */
+.view-btn { color: var(--app-primary) !important; }
 .edit-btn   { color: #6366f1 !important; }
 .delete-btn { color: #dc2626 !important; }
 

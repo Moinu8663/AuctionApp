@@ -134,6 +134,14 @@
   background: #dcfce7;
   color: #15803d;
 }
+.role-badge.team {
+  background: #dbeafe;
+  color: #1dafd8;
+}
+.role-badge.player {
+  background: #dbeafe;
+  color: #d87e1d;
+}
 
 /* ===== ACTION BUTTONS ===== */
 .edit-btn { color: #6366f1 !important; }

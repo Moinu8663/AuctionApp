@@ -1,0 +1,11 @@
+.dialog-form { display: flex; flex-direction: column; gap: 12px; padding-top: 4px; }
+.full-width { width: 100%; }
+.save-btn { background: linear-gradient(90deg, #6366f1, #8b5cf6) !important; color: white !important; min-width: 96px; }
+.delete-btn { background: transparent !important; color: #dc2626 !important; min-width: 118px; border: 1px solid rgba(220, 38, 38, 0.16); }
+.delete-confirm { text-align: center; padding: 12px 8px 4px; color: #334155; }
+.delete-avatar { width: 58px; height: 58px; border-radius: 50%; background: transparent; color: #dc2626; display: flex; align-items: center; justify-content: center; margin: 0 auto 12px; border: 1px solid rgba(220, 38, 38, 0.16); }
+.delete-avatar mat-icon { font-size: 28px; width: 28px; height: 28px; }
+.delete-sub { color: #94a3b8; font-size: 0.85rem; margin-top: -6px; }
+.error-box { display: flex; align-items: center; gap: 8px; padding: 10px 12px; border-radius: 8px; background: #fee2e2; color: #b91c1c; font-size: 0.85rem; }
+.hint-row { display: flex; align-items: center; gap: 8px; color: #64748b; font-size: 0.82rem; }
+.active-check { color: #334155; margin-top: -4px; }
