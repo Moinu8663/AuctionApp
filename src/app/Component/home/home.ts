@@ -1,4 +1,4 @@
-import { Component, inject, PLATFORM_ID, ChangeDetectorRef } from '@angular/core';
+import { Component, inject, PLATFORM_ID } from '@angular/core';
 import { ProfileService } from '../../Services/Profile/ProfileService';
 import { AuctionService } from '../../Services/AuctionService/auction-service';
 import { TeamService } from '../../Services/TeamService/team-service';
@@ -22,7 +22,6 @@ export class Home {
   private readonly playerService  = inject(PlayerService);
   private readonly platformId     = inject(PLATFORM_ID);
   private readonly dialog         = inject(MatDialog);
-  private readonly cdr             = inject(ChangeDetectorRef);
 
   username       = '';
   activityLoading = false;
@@ -90,9 +89,8 @@ export class Home {
           .slice(0, 10);
 
         this.activityLoading = false;
-        this.cdr.detectChanges();
       },
-      error: () => { this.activityLoading = false; this.cdr.detectChanges(); }
+      error: () => { this.activityLoading = false; }
     });
   }
 }

@@ -1,25 +1,36 @@
 <div class="dashboard-page">
-  <div class="dashboard-hero">
-    <div>
-      <h2>Auction Dashboard</h2>
-      <p>Track purse, player buying, teams, and auction history in one place.</p>
-    </div>
-
-    <label class="auction-picker">
-      <span>Auction</span>
-      <select [value]="selectedAuctionId" (change)="onAuctionChange($event)">
-        @for (auction of auctions; track getAuctionId(auction)) {
-          <option [value]="getAuctionId(auction)">{{ auction.auctionName }}</option>
-        }
-      </select>
-    </label>
-  </div>
-
   @if (isLoading) {
     <div class="loader"><mat-spinner diameter="44"></mat-spinner></div>
   }
 
-  @if (!isLoading && selectedAuction) {
+  @if (!isLoading && isSetupOpen) {
+    <div class="setup-backdrop">
+      <div class="setup-dialog" role="dialog" aria-modal="true" aria-labelledby="dashboardSetupTitle">
+        <div class="setup-header">
+          <div>
+            <h3 id="dashboardSetupTitle">View Admin Dashboard</h3>
+            <p>Select an auction to view dashboard details.</p>
+          </div>
+        </div>
+
+        <label class="auction-picker setup-field">
+          <span>Auction</span>
+          <select [value]="pendingAuctionId" (change)="onSetupAuctionChange($event)">
+            @for (auction of auctions; track getAuctionId(auction)) {
+              <option [value]="getAuctionId(auction)">{{ getAuctionName(auction) }}</option>
+            }
+          </select>
+        </label>
+
+        <button type="button" class="view-button" [disabled]="!pendingAuctionId" (click)="viewDashboard()">
+          <mat-icon>visibility</mat-icon>
+          <span>View</span>
+        </button>
+      </div>
+    </div>
+  }
+
+  @if (!isLoading && isDashboardVisible && selectedAuction) {
     <div class="overview-grid">
       <div class="overview-card highlight">
         <mat-icon>account_balance_wallet</mat-icon>
@@ -51,116 +62,141 @@
       </div>
     </div>
 
-    <div class="content-grid">
-      <section class="panel teams-panel">
-        <div class="section-header">
+    <div class="admin-grid">
+      <section class="panel player-detail-card">
+        <div class="section-title">
+          <mat-icon>person_search</mat-icon>
           <div>
-            <h3>Teams & Purse</h3>
-            <p>Remaining purse and player buy count per team.</p>
+            <h3>Player Details</h3>
+            <span>{{ getAuctionName(selectedAuction) }}</span>
           </div>
         </div>
 
-        <div class="team-grid">
-          @for (item of teamSummaries; track item.team.teamId || item.team.id || item.team.teamName) {
-            <div class="team-card">
-              <div class="team-head">
-                <div class="team-logo">
-                  @if (item.team.logoUrl) {
-                    <img [src]="item.team.logoUrl" [alt]="item.team.teamName">
-                  } @else {
-                    <span>{{ getInitial(item.team.teamName) }}</span>
-                  }
-                </div>
-                <div>
-                  <h4>{{ item.team.teamName }}</h4>
-                  <p>{{ item.team.ownerName || 'No owner' }}</p>
-                </div>
-              </div>
-              <div class="purse-row">
-                <span>Purse</span>
-                <strong>Rs {{ item.purse | number }}</strong>
-              </div>
-              <div class="purse-row">
-                <span>Remaining</span>
-                <strong class="positive">Rs {{ item.remaining | number }}</strong>
-              </div>
-              <div class="purse-row">
-                <span>Players Bought</span>
-                <strong>{{ item.boughtCount }}</strong>
-              </div>
+        @if (selectedPlayer) {
+          <div class="player-profile">
+            <div class="player-photo large">
+              @if (getPlayerPicUrl(selectedPlayer)) {
+                <img [src]="getPlayerPicUrl(selectedPlayer)" [alt]="getPlayerName(selectedPlayer)">
+              } @else {
+                <span>{{ getInitial(getPlayerName(selectedPlayer)) }}</span>
+              }
             </div>
-          }
-        </div>
+            <div>
+              <h4>{{ getPlayerName(selectedPlayer) }}</h4>
+              <p>{{ getPlayerRole(selectedPlayer) }}</p>
+            </div>
+          </div>
+
+          <div class="detail-list">
+            <div><span>Country</span><strong>{{ selectedPlayer.country ?? selectedPlayer.Country ?? '-' }}</strong></div>
+            <div><span>Age</span><strong>{{ selectedPlayer.age ?? selectedPlayer.Age ?? '-' }}</strong></div>
+            <div><span>Email</span><strong>{{ selectedPlayer.email ?? selectedPlayer.Email ?? '-' }}</strong></div>
+            <div><span>Status</span><strong>{{ isPlayerSold(selectedPlayer) ? 'Sold' : 'Available' }}</strong></div>
+          </div>
+        } @else {
+          <div class="empty-state">No player found for this auction.</div>
+        }
       </section>
 
-      <section class="panel players-panel">
-        <div class="section-header">
+      <section class="panel bid-card">
+        <div class="section-title">
+          <mat-icon>gavel</mat-icon>
           <div>
-            <h3>Player Info</h3>
-            <p>Players in {{ selectedAuction.auctionName }}.</p>
+            <h3>Bid Details</h3>
+            <span>Selected player pricing</span>
           </div>
-          <span>{{ auctionPlayers.length }} total</span>
         </div>
 
-        <div class="player-card-grid">
-          @for (player of auctionPlayers; track player.playerId || player.id || player.playerName) {
-            <div class="player-card">
-              <div class="player-photo">
-                @if (player.picUrl) {
-                  <img [src]="player.picUrl" [alt]="player.playerName">
-                } @else {
-                  <span>{{ getInitial(player.playerName) }}</span>
-                }
-              </div>
-              <div class="player-body">
-                <div class="player-line">
-                  <h4>{{ player.playerName }}</h4>
-                  <span class="role-badge">{{ player.role || 'Player' }}</span>
-                </div>
-                <p>{{ player.country || '-' }} @if (player.age) { <span> | {{ player.age }} yrs</span> }</p>
-                <div class="player-tags">
-                  <span>Base Rs {{ player.basePrice | number }}</span>
-                  <span>{{ player.isSold ? 'Sold' : 'Available' }}</span>
-                </div>
-              </div>
+        @if (selectedPlayer) {
+          <div class="bid-values">
+            <div>
+              <span>Base Price</span>
+              <strong>Rs {{ getPlayerBasePrice(selectedPlayer) | number }}</strong>
             </div>
-          }
-        </div>
+            <div>
+              <span>Current Bid</span>
+              <strong>Rs {{ getBidPrice(selectedPlayer) | number }}</strong>
+            </div>
+            <div>
+              <span>Team Name</span>
+              <strong>{{ bidTeamName }}</strong>
+            </div>
+          </div>
+        } @else {
+          <div class="empty-state">Select a player to view bid details.</div>
+        }
       </section>
     </div>
+
+    <section class="panel">
+      <div class="section-header">
+        <div>
+          <h3>All Team Details</h3>
+          <p>Remaining purse and total players bought for this auction.</p>
+        </div>
+        <span>{{ auctionTeams.length }} teams</span>
+      </div>
+
+      <div class="team-grid admin-team-grid">
+        @for (item of teamSummaries; track getTeamName(item.team)) {
+          <div class="team-card">
+            <div class="team-head">
+              <div class="team-logo">
+                @if (getTeamLogoUrl(item.team)) {
+                  <img [src]="getTeamLogoUrl(item.team)" [alt]="getTeamName(item.team)">
+                } @else {
+                  <span>{{ getInitial(getTeamName(item.team)) }}</span>
+                }
+              </div>
+              <div>
+                <h4>{{ getTeamName(item.team) }}</h4>
+                <p>{{ getTeamOwner(item.team) }}</p>
+              </div>
+            </div>
+
+            <div class="team-stats">
+              <div><span>Remaining Purse</span><strong>Rs {{ item.remaining | number }}</strong></div>
+              <div><span>Total Bought</span><strong>{{ item.boughtCount }}</strong></div>
+              <div><span>Total Purse</span><strong>Rs {{ item.purse | number }}</strong></div>
+              <div><span>Spent</span><strong>Rs {{ item.spent | number }}</strong></div>
+            </div>
+          </div>
+        }
+      </div>
+    </section>
 
     <section class="panel history-panel">
       <div class="section-header">
         <div>
-          <h3>Auction History</h3>
-          <p>Sold player, auction price, and buyer team.</p>
+          <h3>Recent Auction History</h3>
+          <p>Players bought, buyer team, and sold price.</p>
         </div>
-        <span>{{ historyPlayers.length }} sold</span>
+        <span>{{ soldPlayers.length }} sold</span>
       </div>
 
       @if (historyPlayers.length) {
         <div class="history-list">
-          @for (player of historyPlayers; track player.playerId || player.id || player.playerName) {
+          @for (player of historyPlayers; track getPlayerId(player)) {
             <div class="history-item">
               <div class="history-player">
-                <div class="mini-avatar">{{ getInitial(player.playerName) }}</div>
+                <div class="mini-avatar">{{ getInitial(getPlayerName(player)) }}</div>
                 <div>
-                  <strong>{{ player.playerName }}</strong>
-                  <span>{{ player.role || '-' }}</span>
+                  <strong>{{ getPlayerName(player) }}</strong>
+                  <span>{{ getPlayerRole(player) }}</span>
                 </div>
               </div>
-              <div class="history-price">Rs {{ player.soldPrice | number }}</div>
-              <div class="history-team">{{ getTeamName(player) }}</div>
+              <div class="history-team">{{ getPlayerTeamName(player) }}</div>
+              <div class="history-price">Rs {{ getBidPrice(player) | number }}</div>
             </div>
           }
         </div>
       } @else {
-        <div class="empty-state">No player auction history found.</div>
+        <div class="empty-state">No recent auction history found.</div>
       }
     </section>
   }
 
-  @if (!isLoading && !selectedAuction) {
+  @if (!isLoading && isDashboardVisible && !selectedAuction) {
     <div class="empty-state">No auction found.</div>
   }
 </div>

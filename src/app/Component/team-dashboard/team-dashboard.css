@@ -1,0 +1,57 @@
+.team-dashboard-page { padding: 16px; min-height: 100vh; background: #f8fafc; position: relative; }
+
+.loader { display: flex; justify-content: center; padding: 60px; }
+
+.setup-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,.45); display: flex; align-items: center; justify-content: center; z-index: 100; }
+.setup-dialog { background: #fff; border-radius: 12px; padding: 28px; width: 100%; max-width: 420px; display: flex; flex-direction: column; gap: 16px; box-shadow: 0 8px 32px rgba(0,0,0,.18); }
+.setup-header h3 { margin: 0 0 4px; font-size: 1.2rem; font-weight: 700; }
+.setup-header p  { margin: 0; color: #64748b; font-size: .875rem; }
+.setup-field { display: flex; flex-direction: column; gap: 6px; font-size: .875rem; font-weight: 500; }
+.setup-field select { padding: 8px 10px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: .875rem; outline: none; }
+.start-button { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 10px 20px; background: #2563eb; color: #fff; border: none; border-radius: 8px; font-size: .95rem; font-weight: 600; cursor: pointer; }
+.start-button:disabled { opacity: .5; cursor: not-allowed; }
+
+.td-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+@media (max-width: 768px) { .td-layout { grid-template-columns: 1fr; } }
+
+.td-left, .td-right { display: flex; flex-direction: column; gap: 16px; }
+
+.panel { background: #fff; border-radius: 12px; padding: 20px; box-shadow: 0 1px 4px rgba(0,0,0,.08); }
+
+.panel-title { display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 1rem; margin-bottom: 16px; color: #1e293b; }
+.panel-title mat-icon { color: #2563eb; font-size: 20px; }
+.auction-badge { margin-left: auto; font-size: .75rem; background: #eff6ff; color: #2563eb; padding: 2px 8px; border-radius: 999px; font-weight: 600; }
+.count-badge { margin-left: auto; font-size: .75rem; background: #f1f5f9; color: #475569; padding: 2px 8px; border-radius: 999px; }
+
+.player-card { display: flex; align-items: center; gap: 14px; margin-bottom: 16px; }
+.player-avatar { width: 56px; height: 56px; border-radius: 50%; background: #2563eb; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 1.4rem; font-weight: 700; overflow: hidden; flex-shrink: 0; }
+.player-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.player-meta h3 { margin: 0 0 4px; font-size: 1.05rem; font-weight: 700; }
+.player-meta p  { margin: 0; color: #64748b; font-size: .85rem; }
+
+.bid-info { display: flex; flex-direction: column; gap: 10px; margin-bottom: 12px; }
+.bid-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; border-radius: 8px; background: #f8fafc; font-size: .875rem; }
+.bid-row.highlight { background: #eff6ff; }
+.bid-row.highlight strong { color: #2563eb; font-size: 1rem; }
+
+.bid-message { padding: 8px 12px; background: #f0fdf4; color: #15803d; border-radius: 8px; font-size: .85rem; font-weight: 500; }
+
+.bid-button { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 12px; background: #16a34a; color: #fff; border: none; border-radius: 10px; font-size: 1rem; font-weight: 700; cursor: pointer; transition: background .2s; }
+.top-bid-button { margin-bottom: 14px; }
+.bid-button:hover:not(:disabled) { background: #15803d; }
+.bid-button:disabled { opacity: .45; cursor: not-allowed; }
+
+.team-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.team-stats > div { background: #f8fafc; border-radius: 8px; padding: 10px 12px; }
+.team-stats span  { display: block; font-size: .75rem; color: #64748b; margin-bottom: 4px; }
+.team-stats strong { font-size: .95rem; color: #1e293b; }
+
+.bought-list { display: flex; flex-direction: column; gap: 8px; }
+.bought-item { display: flex; align-items: center; gap: 10px; padding: 8px; background: #f8fafc; border-radius: 8px; }
+.mini-avatar { width: 34px; height: 34px; border-radius: 50%; background: #2563eb; display: flex; align-items: center; justify-content: center; color: #fff; font-size: .85rem; font-weight: 700; flex-shrink: 0; }
+.bought-meta { flex: 1; }
+.bought-meta strong { display: block; font-size: .875rem; }
+.bought-meta span   { font-size: .75rem; color: #64748b; }
+.bought-price { font-size: .85rem; font-weight: 700; color: #2563eb; }
+
+.empty-state { padding: 24px; text-align: center; color: #94a3b8; font-size: .875rem; }

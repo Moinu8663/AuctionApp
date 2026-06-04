@@ -1,1 +1,252 @@
-<p>admin-dashboard works!</p>
+<div class="admin-dashboard-page">
+  @if (isLoading) {
+    <div class="loader"><mat-spinner diameter="44"></mat-spinner></div>
+  }
+
+  @if (!isLoading && isSetupOpen) {
+    <div class="setup-backdrop">
+      <div class="setup-dialog" role="dialog" aria-modal="true" aria-labelledby="dashboardSetupTitle">
+        <div class="setup-header">
+          <div>
+            <h3 id="dashboardSetupTitle">Start Auction</h3>
+            <p>Select an auction and player before starting.</p>
+          </div>
+          @if (isDashboardStarted) {
+            <button type="button" class="icon-button" (click)="isSetupOpen = false" aria-label="Close setup">
+              <mat-icon>close</mat-icon>
+            </button>
+          }
+        </div>
+
+        <div class="setup-form">
+          <label class="filter-field setup-field">
+            <span>Auction</span>
+            <select [value]="pendingAuctionId" (change)="onSetupAuctionChange($event)">
+              @for (auction of auctions; track getAuctionId(auction)) {
+                <option [value]="getAuctionId(auction)">{{ auction.auctionName }}</option>
+              }
+            </select>
+          </label>
+
+          <label class="filter-field setup-field">
+            <span>Player</span>
+            <select [value]="pendingPlayerId" (change)="onSetupPlayerChange($event)">
+              @for (player of pendingAuctionAvailablePlayers; track getPlayerId(player)) {
+                <option [value]="getPlayerId(player)">{{ player.playerName }}</option>
+              }
+            </select>
+          </label>
+        </div>
+
+        <div class="setup-preview">
+          <div>
+            <span>Ready to start</span>
+            <strong>{{ pendingAuction?.auctionName || '-' }}</strong>
+            <small>{{ pendingPlayer?.playerName || 'No player selected' }}</small>
+            <small>{{ pendingAuctionAvailablePlayers.length }} players available</small>
+          </div>
+        </div>
+
+        <button type="button" class="start-button" [disabled]="!pendingAuctionId || !pendingPlayerId" (click)="startDashboard()">
+          <mat-icon>play_arrow</mat-icon>
+          <span>Start Auction</span>
+        </button>
+      </div>
+    </div>
+  }
+
+  @if (isNextPlayerOpen) {
+    <div class="setup-backdrop">
+      <div class="setup-dialog" role="dialog" aria-modal="true" aria-labelledby="nextPlayerTitle">
+        <div class="setup-header">
+          <div>
+            <h3 id="nextPlayerTitle">Next Player</h3>
+            <p>Select the next player for auction.</p>
+          </div>
+          <button type="button" class="icon-button" (click)="closeNextPlayer()" aria-label="Close">
+            <mat-icon>close</mat-icon>
+          </button>
+        </div>
+
+        <label class="filter-field setup-field">
+          <span>Player</span>
+          <select [value]="pendingPlayerId" (change)="onSetupPlayerChange($event)">
+            @for (player of pendingAuctionAvailablePlayers; track getPlayerId(player)) {
+              <option [value]="getPlayerId(player)">{{ player.playerName }}</option>
+            }
+          </select>
+        </label>
+
+        <div class="setup-preview">
+          <div>
+            <span>{{ pendingAuctionAvailablePlayers.length }} players remaining</span>
+            <strong>{{ pendingPlayer?.playerName || 'No player selected' }}</strong>
+          </div>
+        </div>
+
+        <button type="button" class="start-button" [disabled]="!pendingPlayerId" (click)="confirmNextPlayer()">
+          <mat-icon>play_arrow</mat-icon>
+          <span>Next</span>
+        </button>
+      </div>
+    </div>
+  }
+
+  @if (!isLoading && !isDashboardStarted) {
+    <div class="empty-state">Select an auction and player, then start the auction.</div>
+  }
+
+  @if (!isLoading && isDashboardStarted && selectedAuction) {
+    <div class="dashboard-grid">
+      <section class="panel player-detail-card">
+        <div class="section-title">
+          <mat-icon>person_search</mat-icon>
+          <div>
+            <h3>Player Details</h3>
+            <span>{{ selectedAuction.auctionName }}</span>
+          </div>
+        </div>
+
+        @if (selectedPlayer) {
+          <div class="player-profile">
+            <div class="player-photo">
+              @if (selectedPlayer.picUrl) {
+                <img [src]="selectedPlayer.picUrl" [alt]="selectedPlayer.playerName">
+              } @else {
+                <span>{{ getInitial(selectedPlayer.playerName) }}</span>
+              }
+            </div>
+            <div>
+              <h4>{{ selectedPlayer.playerName }}</h4>
+              <p>{{ selectedPlayer.role || 'Player' }}</p>
+            </div>
+          </div>
+
+          <div class="detail-list">
+            <div><span>Country</span><strong>{{ selectedPlayer.country || '-' }}</strong></div>
+            <div><span>Age</span><strong>{{ selectedPlayer.age || '-' }}</strong></div>
+            <div><span>Email</span><strong>{{ selectedPlayer.email || '-' }}</strong></div>
+            <div><span>Status</span><strong>{{ isPlayerSold(selectedPlayer) ? 'Sold' : 'Available' }}</strong></div>
+          </div>
+        } @else {
+          <div class="empty-state">No player found for this auction.</div>
+        }
+      </section>
+
+      <section class="panel bid-card">
+        <div class="section-title">
+          <mat-icon>gavel</mat-icon>
+          <div>
+            <h3>Bid Details</h3>
+            <span>Selected player pricing</span>
+          </div>
+        </div>
+
+        @if (selectedPlayer) {
+          <div class="bid-values">
+            <div>
+              <span>Base Price</span>
+              <strong>Rs {{ selectedPlayer.basePrice | number }}</strong>
+            </div>
+            <div>
+              <span>Current Bid</span>
+              <strong>Rs {{ currentBidDisplay | number }}</strong>
+            </div>
+            <div>
+              <span>Team Name</span>
+              <strong>{{ bidTeamName }}</strong>
+            </div>
+          </div>
+
+          <div class="bid-actions">
+            <button type="button" class="bid-action sold" [disabled]="isBidUpdating || !selectedBidTeamId" (click)="markPlayerSold()">
+              <mat-icon>check_circle</mat-icon>
+              <span>Sold</span>
+            </button>
+            <button type="button" class="bid-action unsold" [disabled]="isBidUpdating" (click)="markPlayerUnsold()">
+              <mat-icon>cancel</mat-icon>
+              <span>Unsold</span>
+            </button>
+          </div>
+
+          @if (bidActionMessage) {
+            <div class="bid-message">{{ bidActionMessage }}</div>
+          }
+        } @else {
+          <div class="empty-state">Select a player to view bid details.</div>
+        }
+      </section>
+    </div>
+
+    <section class="panel">
+      <div class="section-header">
+        <div>
+          <h3>All Team Details</h3>
+          <p>Remaining purse and total players bought for the selected auction.</p>
+        </div>
+        <span>{{ auctionTeams.length }} teams</span>
+      </div>
+
+      <div class="team-grid">
+        @for (item of teamSummaries; track item.team.teamId || item.team.id || item.team.teamName) {
+          <div class="team-card">
+            <div class="team-head">
+              <div class="team-logo">
+                @if (item.team.logoUrl) {
+                  <img [src]="item.team.logoUrl" [alt]="item.team.teamName">
+                } @else {
+                  <span>{{ getInitial(item.team.teamName) }}</span>
+                }
+              </div>
+              <div>
+                <h4>{{ item.team.teamName }}</h4>
+                <p>{{ item.team.ownerName || 'No owner' }}</p>
+              </div>
+            </div>
+
+            <div class="team-stats">
+              <div><span>Remaining Purse</span><strong>Rs {{ item.remaining | number }}</strong></div>
+              <div><span>Total Bought</span><strong>{{ item.boughtCount }}</strong></div>
+              <div><span>Total Purse</span><strong>Rs {{ item.purse | number }}</strong></div>
+              <div><span>Spent</span><strong>Rs {{ item.spent | number }}</strong></div>
+            </div>
+          </div>
+        }
+      </div>
+    </section>
+
+    <section class="panel history-panel">
+      <div class="section-header">
+        <div>
+          <h3>Recent Auction History</h3>
+          <p>Players bought, buyer team, and sold price.</p>
+        </div>
+        <span>{{ soldPlayers.length }} sold</span>
+      </div>
+
+      @if (historyPlayers.length) {
+        <div class="history-list">
+          @for (player of historyPlayers; track getPlayerId(player)) {
+            <div class="history-item">
+              <div class="history-player">
+                <div class="mini-avatar">{{ getInitial(player.playerName) }}</div>
+                <div>
+                  <strong>{{ player.playerName }}</strong>
+                  <span>{{ player.role || '-' }}</span>
+                </div>
+              </div>
+              <div>{{ getTeamName(player) }}</div>
+              <strong>Rs {{ getBidPrice(player) | number }}</strong>
+            </div>
+          }
+        </div>
+      } @else {
+        <div class="empty-state">No recent auction history found.</div>
+      }
+    </section>
+  }
+
+  @if (!isLoading && isDashboardStarted && !selectedAuction) {
+    <div class="empty-state">No auction found.</div>
+  }
+</div>

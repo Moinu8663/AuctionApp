@@ -18,20 +18,32 @@ export const routes: Routes = [
       {
         path: 'home',
         canActivate: [roleGuard],
-        data: { roles: ['Admin', 'User', 'SuperAdmin'] },
+        data: { roles: ['Admin', 'User', 'SuperAdmin','Team','Player'] },
         loadComponent: () => import('./Component/home/home').then(m => m.Home)
       },
       {
         path: 'dashboard',
         canActivate: [roleGuard],
-        data: { roles: ['Admin', 'User', 'SuperAdmin'] },
+        data: { roles: ['Admin', 'User', 'SuperAdmin','Team','Player'] },
         loadComponent: () => import('./Component/dashboard/dashboard').then(m => m.Dashboard)
       },
       {
         path: 'profile',
         canActivate: [roleGuard],
-        data: { roles: ['Admin', 'User', 'SuperAdmin'] },
+        data: { roles: ['Admin', 'User', 'SuperAdmin','Team','Player'] },
         loadComponent: () => import('./Component/profile/profile').then(m => m.Profile)
+      },
+      {
+        path: 'admin-dashboard',
+        canActivate: [roleGuard],
+        data: { roles: ['SuperAdmin'] },
+        loadComponent: () => import('./Component/admin-dashboard/admin-dashboard').then(m => m.AdminDashboard)
+      },
+      {
+        path: 'team-dashboard',
+        canActivate: [roleGuard],
+        data: { roles: ['SuperAdmin', 'Admin', 'Team'] },
+        loadComponent: () => import('./Component/team-dashboard/team-dashboard').then(m => m.TeamDashboard)
       },
       {
         path: 'adminpanel',

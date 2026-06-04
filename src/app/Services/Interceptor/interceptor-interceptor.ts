@@ -1,11 +1,13 @@
 import { HttpInterceptorFn, HttpResponse } from '@angular/common/http';
 import { inject, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
-import { Crypto } from '../DecodeService/crypto';
+import { Crypto } from '@moin8663/doublecrypto';
 import { map } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 export const interceptorInterceptor: HttpInterceptorFn = (req, next) => {
-  const crypto = inject(Crypto);
+  const masterkey = environment.masterkey;
+  const crypto = new Crypto(masterkey);
   const platformId = inject(PLATFORM_ID);
 
   const token = isPlatformBrowser(platformId)

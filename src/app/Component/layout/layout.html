@@ -15,8 +15,9 @@
       </div>
 
       <nav>
-        @for (menu of menus; track menu.name) {
-            @if (menu.children) {
+        @if (isMenuLoaded) {
+          @for (menu of menus; track menu.name) {
+            @if (hasChildren(menu)) {
               <div class="menu-parent" (click)="toggleExpand(menu.name)">
                 <mat-icon matPrefix>{{ menu.icon }}</mat-icon>
                 <span class="menu-parent-name">{{ menu.name }}</span>
@@ -36,12 +37,13 @@
               }
             }
 
-            @if (!menu.children) {
+            @if (!hasChildren(menu)) {
               <a [routerLink]="menu.route" routerLinkActive="active" (click)="closeMobileSidebar()">
                 <mat-icon matPrefix>{{ menu.icon }}</mat-icon>
                 <span>{{ menu.name }}</span>
               </a>
             }
+          }
         }
       </nav>
 

@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { afterNextRender, ChangeDetectionStrategy, ChangeDetectorRef, Component, inject } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
 import { Login } from '../../Services/Login/login';
 import { MatMenuModule } from '@angular/material/menu';
@@ -12,7 +12,7 @@ export interface MenuItem {
   icon: string;
   route?: string;
   roles: string[];
-  children?: MenuItem[];
+  children: MenuItem[];
 }
 
 @Component({
@@ -20,11 +20,13 @@ export interface MenuItem {
   imports: [RouterModule, MatMenuModule, MatIconModule, MatButtonModule, MatDividerModule],
   templateUrl: './layout.html',
   styleUrl: './layout.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Layout {
   private readonly login = inject(Login);
   private readonly router = inject(Router);
-  private readonly menuaccessservice = inject(MenuAccessService)
+  private readonly menuaccessservice = inject(MenuAccessService);
+  private readonly cdr = inject(ChangeDetectorRef);
 
   isSidebarVisible = true;
   isMobileOpen = false;
@@ -34,21 +36,29 @@ export class Layout {
   }
   username = '';
   role = '';
+  isMenuLoaded = false;
 
   menus: MenuItem[] = [];
 
   expandedMenus = new Set<string>();
 
-  ngOnInit() {
-    if (typeof window !== 'undefined') {
-      this.username = sessionStorage.getItem('name') || 'User';
-      this.role = sessionStorage.getItem('role') || '';
-    }
-    this.GetRoleMenu();
+  constructor() {
+    afterNextRender(() => {
+      setTimeout(() => {
+        this.username = sessionStorage.getItem('name') || 'User';
+        this.role = sessionStorage.getItem('role') || '';
+        this.GetRoleMenu();
+        this.cdr.detectChanges();
+      });
+    });
   }
 
   hasRole(allowedRoles: string[]): boolean {
     return allowedRoles.includes(this.role);
+  }
+
+  hasChildren(menu: MenuItem): boolean {
+    return menu.children.length > 0;
   }
 
   toggleExpand(name: string): void {
@@ -81,26 +91,36 @@ export class Layout {
             .map((child: any) => ({
               name: child.menuName,
               icon: child.icon,
-              route: child.routeUrl,
-              roles: [child.roleName]
+              route: this.normalizeRoute(child.routeUrl),
+              roles: [child.roleName],
+              children: []
             }));
 
           return {
             name: parent.menuName,
             icon: parent.icon,
-            route: parent.routeUrl,
+            route: this.normalizeRoute(parent.routeUrl),
             roles: [parent.roleName],
-            children: children.length > 0 ? children : undefined
+            children
           };
         });
 
       this.menus = parentMenus;
+      this.isMenuLoaded = true;
+      this.cdr.markForCheck();
        },
-      error: (err) => {  },
+      error: (err) => { this.isMenuLoaded = true; this.cdr.markForCheck(); },
     });
   }
 
   closeMobileSidebar() { this.isMobileOpen = false; }
   Logout() { this.login.logout(); }
   profile() { this.router.navigate(['/profile']); }
+
+  private normalizeRoute(route: string | null | undefined): string | undefined {
+    if (!route) return undefined;
+
+    const trimmed = route.trim();
+    return trimmed.startsWith('/') ? trimmed : `/${trimmed}`;
+  }
 }

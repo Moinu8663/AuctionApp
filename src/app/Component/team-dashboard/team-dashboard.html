@@ -1,1 +1,146 @@
-<p>team-dashboard works!</p>
+<div class="team-dashboard-page">
+  @if (isLoading) {
+    <div class="loader"><mat-spinner diameter="44"></mat-spinner></div>
+  }
+
+  @if (isSetupOpen) {
+    <div class="setup-backdrop">
+      <div class="setup-dialog" role="dialog" aria-modal="true">
+        <div class="setup-header">
+          <h3>Join Auction</h3>
+          <p>Select your auction and team to start bidding.</p>
+        </div>
+
+        <label class="setup-field">
+          <span>Auction</span>
+          <select [value]="pendingAuctionId" (change)="onSetupAuctionChange($event)">
+            @for (a of auctions; track getAuctionId(a)) {
+              <option [value]="getAuctionId(a)">{{ a.auctionName }}</option>
+            }
+          </select>
+        </label>
+
+        <label class="setup-field">
+          <span>Team</span>
+          <select [value]="pendingTeamId" (change)="onSetupTeamChange($event)">
+            @for (t of pendingAuctionTeams; track getTeamId(t)) {
+              <option [value]="getTeamId(t)">{{ t.teamName }}</option>
+            }
+          </select>
+        </label>
+
+        <button type="button" class="start-button" [disabled]="!pendingAuctionId || !pendingTeamId" (click)="viewDashboard()">
+          <mat-icon>sports_cricket</mat-icon>
+          <span>Go to Dashboard</span>
+        </button>
+      </div>
+    </div>
+  }
+
+  @if (!isLoading && isDashboardVisible) {
+    <div class="td-layout">
+      <div class="td-left">
+        <div class="panel live-panel">
+          <div class="panel-title">
+            <mat-icon>person_search</mat-icon>
+            <span>Live Player</span>
+            @if (selectedAuction) {
+              <span class="auction-badge">{{ getAuctionName(selectedAuction) }}</span>
+            }
+          </div>
+
+          @if (livePlayer) {
+            <div class="player-card">
+              <div class="player-avatar">
+                @if (getPlayerPicUrl(livePlayer)) {
+                  <img [src]="getPlayerPicUrl(livePlayer)" [alt]="getPlayerName(livePlayer)">
+                } @else {
+                  <span>{{ getInitial(getPlayerName(livePlayer)) }}</span>
+                }
+              </div>
+              <div class="player-meta">
+                <h3>{{ getPlayerName(livePlayer) }}</h3>
+                <p>{{ getPlayerRole(livePlayer) }} - {{ getPlayerCountry(livePlayer) }}</p>
+              </div>
+            </div>
+
+            <button type="button" class="bid-button top-bid-button" [disabled]="!canBid" (click)="placeBid()">
+              <mat-icon>gavel</mat-icon>
+              <span>Place Bid - Rs {{ nextBidAmount | number }}</span>
+            </button>
+
+            <div class="bid-info">
+              <div class="bid-row">
+                <span>Base Price</span>
+                <strong>Rs {{ getPlayerBasePrice(livePlayer) | number }}</strong>
+              </div>
+              <div class="bid-row highlight">
+                <span>Current Bid</span>
+                <strong>Rs {{ currentBidDisplay | number }}</strong>
+              </div>
+              <div class="bid-row">
+                <span>Bidding Team</span>
+                <strong>{{ currentBidTeamName || '-' }}</strong>
+              </div>
+              <div class="bid-row">
+                <span>Next Bid</span>
+                <strong>Rs {{ nextBidAmount | number }}</strong>
+              </div>
+            </div>
+
+            @if (bidMessage) {
+              <div class="bid-message">{{ bidMessage }}</div>
+            }
+          } @else {
+            <div class="empty-state">Waiting for admin to start auction...</div>
+          }
+        </div>
+      </div>
+
+      <div class="td-right">
+        <div class="panel team-info-panel">
+          <div class="panel-title">
+            <mat-icon>groups</mat-icon>
+            <span>{{ selectedTeam ? getTeamName(selectedTeam) : 'My Team' }}</span>
+          </div>
+
+          @if (myTeam) {
+            <div class="team-stats">
+              <div><span>Owner</span><strong>{{ getTeamOwner(myTeam) }}</strong></div>
+              <div><span>Total Purse</span><strong>Rs {{ getTeamPurse(myTeam) | number }}</strong></div>
+              <div><span>Remaining</span><strong>Rs {{ remainingPurse | number }}</strong></div>
+              <div><span>Players Bought</span><strong>{{ myTeamPlayers.length }}</strong></div>
+            </div>
+          } @else {
+            <div class="empty-state">Select your team again if team details are not visible.</div>
+          }
+        </div>
+
+        <div class="panel bought-panel">
+          <div class="panel-title">
+            <mat-icon>sports_cricket</mat-icon>
+            <span>Bought Players</span>
+            <span class="count-badge">{{ myTeamPlayers.length }}</span>
+          </div>
+
+          @if (myTeamPlayers.length) {
+            <div class="bought-list">
+              @for (p of myTeamPlayers; track getPlayerId(p)) {
+                <div class="bought-item">
+                  <div class="mini-avatar">{{ getInitial(getPlayerName(p)) }}</div>
+                  <div class="bought-meta">
+                    <strong>{{ getPlayerName(p) }}</strong>
+                    <span>{{ getPlayerRole(p) }}</span>
+                  </div>
+                  <div class="bought-price">Rs {{ (p.soldPrice ?? p.SoldPrice ?? p.basePrice ?? p.BasePrice ?? 0) | number }}</div>
+                </div>
+              }
+            </div>
+          } @else {
+            <div class="empty-state">No players bought yet.</div>
+          }
+        </div>
+      </div>
+    </div>
+  }
+</div>

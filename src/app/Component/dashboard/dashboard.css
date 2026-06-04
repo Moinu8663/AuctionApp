@@ -1,28 +1,82 @@
 .dashboard-page { display: flex; flex-direction: column; gap: 18px; }
-.dashboard-hero {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 18px;
-  padding: 22px 24px;
-  border-radius: 8px;
-  background: linear-gradient(135deg, #0f172a, #164e63);
-  color: white;
-}
-.dashboard-hero h2 { margin: 0 0 5px; font-size: 1.35rem; font-weight: 800; }
-.dashboard-hero p { margin: 0; color: #cbd5e1; font-size: 0.9rem; }
 .auction-picker { display: flex; flex-direction: column; gap: 6px; min-width: 240px; }
-.auction-picker span { color: #cbd5e1; font-size: 0.76rem; text-transform: uppercase; font-weight: 800; }
+.auction-picker span { color: #475569; font-size: 0.76rem; text-transform: uppercase; font-weight: 800; }
 .auction-picker select {
   height: 40px;
-  border: 1px solid rgba(255,255,255,0.22);
+  border: 1px solid #cbd5e1;
   border-radius: 8px;
   padding: 0 12px;
-  background: white;
+  background: #f8fafc;
   color: #0f172a;
   font-weight: 700;
 }
 .loader { display: flex; justify-content: center; padding: 60px 0; }
+
+.setup-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 18px;
+  background: rgba(15, 23, 42, 0.58);
+}
+
+.setup-dialog {
+  width: min(460px, 100%);
+  border-radius: 8px;
+  padding: 20px;
+  background: white;
+  box-shadow: 0 22px 70px rgba(15, 23, 42, 0.24);
+}
+
+.setup-header {
+  margin-bottom: 18px;
+}
+
+.setup-header h3 {
+  margin: 0 0 5px;
+  color: #0f172a;
+  font-size: 1.2rem;
+}
+
+.setup-header p {
+  margin: 0;
+  color: #64748b;
+  font-size: 0.9rem;
+}
+
+.setup-field {
+  min-width: 0;
+}
+
+.view-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  height: 44px;
+  margin-top: 16px;
+  border: 0;
+  border-radius: 8px;
+  color: white;
+  background: var(--app-primary);
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.view-button mat-icon {
+  width: 20px;
+  height: 20px;
+  font-size: 20px;
+}
+
+.view-button:disabled {
+  cursor: not-allowed;
+  background: #94a3b8;
+}
 
 .overview-grid {
   display: grid;
@@ -45,6 +99,7 @@
 .overview-card strong { color: #0f172a; font-size: 1.08rem; }
 
 .content-grid { display: grid; grid-template-columns: minmax(320px, 0.9fr) minmax(0, 1.4fr); gap: 18px; align-items: start; }
+.admin-grid { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(320px, 0.8fr); gap: 18px; align-items: stretch; }
 .panel {
   background: white;
   border: 1px solid #e2e8f0;
@@ -53,10 +108,14 @@
   box-shadow: 0 1px 5px rgba(15, 23, 42, 0.04);
 }
 .section-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
+.section-title { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+.section-title mat-icon { color: var(--app-primary); }
 .section-header h3 { margin: 0 0 3px; color: #0f172a; font-size: 1rem; }
-.section-header p, .section-header span { margin: 0; color: #64748b; font-size: 0.82rem; }
+.section-title h3 { margin: 0 0 3px; color: #0f172a; font-size: 1rem; }
+.section-header p, .section-header span, .section-title span { margin: 0; color: #64748b; font-size: 0.82rem; }
 
 .team-grid { display: grid; gap: 12px; }
+.admin-team-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 .team-card { border: 1px solid #e2e8f0; border-radius: 8px; padding: 13px; background: #f8fafc; }
 .team-head { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
 .team-logo, .player-photo, .mini-avatar {
@@ -77,7 +136,28 @@
 .player-card-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; max-height: 560px; overflow-y: auto; overflow-x: hidden; padding-right: 4px; }
 .player-card { display: flex; gap: 12px; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px; background: #f8fafc; }
 .player-photo { width: 50px; height: 50px; border-radius: 12px; background: linear-gradient(135deg, #eef2ff, #cffafe); color: #4f46e5; overflow: hidden; }
+.player-photo.large { width: 74px; height: 74px; border-radius: 8px; font-size: 1.4rem; }
 .player-photo img { width: 100%; height: 100%; object-fit: cover; }
+.player-profile { display: flex; align-items: center; gap: 14px; margin-bottom: 16px; }
+.player-profile h4 { margin: 0 0 4px; color: #0f172a; font-size: 1.2rem; }
+.player-profile p { margin: 0; color: #64748b; font-weight: 700; }
+.detail-list, .bid-values, .team-stats { display: grid; gap: 10px; }
+.detail-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.detail-list div, .bid-values div, .team-stats div {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 11px 12px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  background: #f8fafc;
+}
+.detail-list span, .bid-values span, .team-stats span { color: #64748b; font-size: 0.8rem; }
+.detail-list strong, .bid-values strong, .team-stats strong { color: #0f172a; text-align: right; }
+.bid-values div:nth-child(2) { border-color: #a5f3fc; background: #ecfeff; }
+.team-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.team-stats div { flex-direction: column; gap: 4px; }
+.team-stats strong { text-align: left; }
 .player-body { min-width: 0; flex: 1; }
 .player-line { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
 .role-badge { padding: 3px 8px; border-radius: 999px; background: #eef2ff; color: #4f46e5; font-size: 0.68rem; font-weight: 800; white-space: nowrap; }
@@ -105,12 +185,11 @@
 
 @media (max-width: 1100px) {
   .overview-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .content-grid { grid-template-columns: 1fr; }
+  .content-grid, .admin-grid, .admin-team-grid { grid-template-columns: 1fr; }
 }
 
 @media (max-width: 720px) {
-  .dashboard-hero { flex-direction: column; align-items: stretch; }
   .auction-picker { min-width: 0; }
-  .overview-grid, .player-card-grid { grid-template-columns: 1fr; }
+  .overview-grid, .player-card-grid, .detail-list, .team-stats { grid-template-columns: 1fr; }
   .history-item { grid-template-columns: 1fr; }
 }
