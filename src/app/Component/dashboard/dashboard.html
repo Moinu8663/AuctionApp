@@ -122,6 +122,13 @@
               <strong>{{ bidTeamName }}</strong>
             </div>
           </div>
+
+          @if (bidTimerSeconds > 0) {
+            <div class="bid-timer" [class.bid-timer-warning]="bidTimerSeconds <= 10">
+              <mat-icon>timer</mat-icon>
+              <span>{{ bidTimerSeconds }}s remaining</span>
+            </div>
+          }
         } @else {
           <div class="empty-state">Select a player to view bid details.</div>
         }

@@ -20,6 +20,15 @@
 
         <div class="setup-form">
           <label class="filter-field setup-field">
+            <span>Round</span>
+            <select [value]="pendingRound" (change)="onRoundChange($event)">
+              <option [value]="1">Round 1 (Main)</option>
+              <option [value]="2">Round 2 (Unsold)</option>
+              <option [value]="3">Round 3 (Exelate)</option>
+            </select>
+          </label>
+
+          <label class="filter-field setup-field">
             <span>Auction</span>
             <select [value]="pendingAuctionId" (change)="onSetupAuctionChange($event)">
               @for (auction of auctions; track getAuctionId(auction)) {
@@ -49,11 +58,14 @@
 
         <button type="button" class="start-button" [disabled]="!pendingAuctionId || !pendingPlayerId" (click)="startDashboard()">
           <mat-icon>play_arrow</mat-icon>
-          <span>Start Auction</span>
+          <span>Start</span>
         </button>
       </div>
     </div>
   }
+
+
+
 
   @if (isNextPlayerOpen) {
     <div class="setup-backdrop">
@@ -67,6 +79,17 @@
             <mat-icon>close</mat-icon>
           </button>
         </div>
+
+
+
+        <label class="filter-field setup-field">
+          <span>Round</span>
+          <select [value]="pendingRound" (change)="onRoundChange($event)">
+            <option [value]="1">Round 1 (Main)</option>
+            <option [value]="2">Round 2 (Unsold)</option>
+            <option [value]="3">Round 3 (Exelate)</option>
+          </select>
+        </label>
 
         <label class="filter-field setup-field">
           <span>Player</span>
@@ -86,8 +109,9 @@
 
         <button type="button" class="start-button" [disabled]="!pendingPlayerId" (click)="confirmNextPlayer()">
           <mat-icon>play_arrow</mat-icon>
-          <span>Next</span>
+          <span>Start</span>
         </button>
+
       </div>
     </div>
   }
@@ -157,6 +181,13 @@
               <strong>{{ bidTeamName }}</strong>
             </div>
           </div>
+
+          @if (bidTimerSeconds > 0) {
+            <div class="bid-timer" [class.bid-timer-warning]="bidTimerSeconds <= 10">
+              <mat-icon>timer</mat-icon>
+              <span>Auto {{ currentBidTeamId ? 'Sold' : 'Unsold' }} in {{ bidTimerSeconds }}s</span>
+            </div>
+          }
 
           <div class="bid-actions">
             <button type="button" class="bid-action sold" [disabled]="isBidUpdating || !selectedBidTeamId" (click)="markPlayerSold()">

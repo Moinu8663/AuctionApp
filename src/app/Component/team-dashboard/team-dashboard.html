@@ -66,8 +66,25 @@
 
             <button type="button" class="bid-button top-bid-button" [disabled]="!canBid" (click)="placeBid()">
               <mat-icon>gavel</mat-icon>
-              <span>Place Bid - Rs {{ nextBidAmount | number }}</span>
+              @if (isLivePlayerSold) {
+                <span>Player Sold</span>
+              } @else if (isLivePlayerUnsold) {
+                <span>Player Unsold</span>
+              } @else if (isBidCooldown) {
+                <span>Wait 5s...</span>
+              } @else if (isMyTeamHighestBidder) {
+                <span>Highest Bidder - Waiting...</span>
+              } @else {
+                <span>Place Bid - Rs {{ nextBidAmount | number }}</span>
+              }
             </button>
+
+            @if (bidTimerSeconds > 0) {
+              <div class="bid-timer" [class.bid-timer-warning]="bidTimerSeconds <= 10">
+                <mat-icon>timer</mat-icon>
+                <span>{{ bidTimerSeconds }}s remaining</span>
+              </div>
+            }
 
             <div class="bid-info">
               <div class="bid-row">

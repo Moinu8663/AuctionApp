@@ -193,3 +193,7 @@
   .overview-grid, .player-card-grid, .detail-list, .team-stats { grid-template-columns: 1fr; }
   .history-item { grid-template-columns: 1fr; }
 }
+
+.bid-timer { display: flex; align-items: center; gap: 8px; margin-top: 12px; padding: 10px 14px; border-radius: 8px; background: #eff6ff; border: 1px solid #bfdbfe; color: #1d4ed8; font-size: .9rem; font-weight: 700; }
+.bid-timer mat-icon { font-size: 18px; width: 18px; height: 18px; }
+.bid-timer-warning { background: #fef2f2; border-color: #fca5a5; color: #b91c1c; }

@@ -45,6 +45,8 @@ export class Dashboard implements OnDestroy {
   livePlayerId: number | string = '';
   currentBid = 0;
   currentBidTeamName = '';
+  bidTimerSeconds = 0;
+  private timerInterval: any = null;
 
   ngOnInit(): void {
     this.loadDashboard();
@@ -64,7 +66,12 @@ export class Dashboard implements OnDestroy {
           this.isSetupOpen = false;
           this.currentBid = 0;
           this.currentBidTeamName = '';
+          this.clearLocalTimer();
           this.loadDashboard(false);
+        } else if (payload?.action === 'timer-reset') {
+          const data = this.parseJson(payload?.playerDataJson);
+          const secs = Number(data?.timerSeconds);
+          if (Number.isFinite(secs) && secs > 0) this.startLocalTimer(secs);
         } else {
           this.loadDashboard(false);
         }
@@ -87,6 +94,7 @@ export class Dashboard implements OnDestroy {
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
+    this.clearLocalTimer();
   }
 
   loadDashboard(showLoader = true): void {
@@ -322,6 +330,28 @@ export class Dashboard implements OnDestroy {
     if (Array.isArray(value?.result)) return value.result;
     if (Array.isArray(value?.items)) return value.items;
     return [];
+  }
+
+  private startLocalTimer(seconds: number): void {
+    this.clearLocalTimer();
+    this.bidTimerSeconds = seconds;
+    this.cdr.markForCheck();
+    this.timerInterval = setInterval(() => {
+      this.bidTimerSeconds--;
+      this.cdr.markForCheck();
+      if (this.bidTimerSeconds <= 0) this.clearLocalTimer();
+    }, 1000);
+  }
+
+  private clearLocalTimer(): void {
+    if (this.timerInterval) { clearInterval(this.timerInterval); this.timerInterval = null; }
+    this.bidTimerSeconds = 0;
+  }
+
+  private parseJson(value: any): any {
+    if (!value || value === '{}') return null;
+    if (typeof value === 'object') return value;
+    try { return JSON.parse(value); } catch { return null; }
   }
 
   private loadLivePlayerFromAdmin(): void {

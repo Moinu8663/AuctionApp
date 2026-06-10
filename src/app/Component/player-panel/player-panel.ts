@@ -30,7 +30,7 @@ export class PlayerPanel implements OnDestroy, AfterViewInit {
     @ViewChild(MatPaginator) paginator!: MatPaginator;
 
 
-  displayedColumns = ['no', 'playerName', 'picUrl', 'role', 'country', 'age', 'mobile', 'email', 'basePrice','soldPrice','isSold', 'auctionName', 'teamName','createdBy', 'createdAt', 'updatedBy', 'updatedAt', 'actions'];
+  displayedColumns = ['no', 'playerName', 'picUrl', 'role', 'country', 'age', 'mobile', 'email', 'basePrice','soldPrice','isSold', 'auctionName', 'teamName', 'attempted', 'createdBy', 'createdAt', 'updatedBy', 'updatedAt', 'actions'];
   dataSource = new MatTableDataSource<any>([]);
 
   isLoading = false;

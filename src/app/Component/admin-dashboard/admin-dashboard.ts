@@ -1,4 +1,6 @@
 import { DecimalPipe, isPlatformBrowser } from '@angular/common';
+
+
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, inject, OnDestroy, PLATFORM_ID } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
@@ -39,6 +41,7 @@ export class AdminDashboard implements OnDestroy {
   selectedPlayerId: number | string = '';
   pendingAuctionId: number | string = '';
   pendingPlayerId: number | string = '';
+  pendingRound: 1 | 2 | 3 = 1;
   isDashboardStarted = false;
   isSetupOpen = false;
   isNextPlayerOpen = false;
@@ -49,6 +52,10 @@ export class AdminDashboard implements OnDestroy {
   currentBid = 0;
   currentBidTeamId: number | string = '';
   currentBidTeamName = '';
+
+  bidTimerSeconds = 0;
+  private bidTimerInterval: any = null;
+  private readonly BID_TIMER_DURATION = 60;
 
   ngOnInit(): void {
     this.loadDashboard();
@@ -67,6 +74,7 @@ export class AdminDashboard implements OnDestroy {
               ? { ...p, currentBidPrice: bid, teamName: payload?.teamName }
               : p
           );
+          this.resetBidTimer();
           this.cdr.markForCheck();
         }
       });
@@ -75,6 +83,7 @@ export class AdminDashboard implements OnDestroy {
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
+    this.clearBidTimer();
   }
 
   loadDashboard(): void {
@@ -90,10 +99,10 @@ export class AdminDashboard implements OnDestroy {
         this.auctions = this.asArray(auctions);
         this.teams = this.asArray(teams);
         this.players = this.asArray(players);
-        this.selectedAuctionId = this.getAuctionId(this.auctions[0]) || '';
-        this.selectedPlayerId = this.getPlayerId(this.auctionPlayers[0]) || '';
-        this.pendingAuctionId = this.selectedAuctionId;
-        this.pendingPlayerId = this.selectedPlayerId;
+        this.pendingAuctionId = this.getAuctionId(this.auctions[0]) || '';
+        this.pendingPlayerId  = this.getPlayerId(this.pendingAuctionAvailablePlayers[0]) || '';
+        this.selectedAuctionId = this.pendingAuctionId;
+        this.selectedPlayerId  = this.pendingPlayerId;
         this.isSetupOpen = true;
         this.isLoading = false;
         this.cdr.markForCheck();
@@ -130,9 +139,16 @@ export class AdminDashboard implements OnDestroy {
     this.pendingPlayerId = (event.target as HTMLSelectElement).value;
   }
 
+  onRoundChange(event: Event): void {
+    const v = Number((event.target as HTMLSelectElement).value);
+    this.pendingRound = v === 2 ? 2 : v === 3 ? 3 : 1;
+    this.pendingPlayerId = this.getPlayerId(this.pendingAuctionAvailablePlayers[0]) || '';
+    this.cdr.markForCheck();
+  }
+
+
   startDashboard(): void {
     if (!this.pendingAuctionId || !this.pendingPlayerId) return;
-
     this.selectedAuctionId  = this.pendingAuctionId;
     this.selectedPlayerId   = this.pendingPlayerId;
     this.isDashboardStarted = true;
@@ -140,8 +156,8 @@ export class AdminDashboard implements OnDestroy {
     this.currentBid         = 0;
     this.currentBidTeamId   = '';
     this.currentBidTeamName = '';
+    this.resetBidTimer();
     this.cdr.markForCheck();
-
     const player = this.selectedPlayer;
     if (player) {
       this.dashboardSignalR.notifyDashboardUpdated({
@@ -156,13 +172,13 @@ export class AdminDashboard implements OnDestroy {
 
   openSetup(): void {
     this.pendingAuctionId = this.selectedAuctionId || this.getAuctionId(this.auctions[0]) || '';
-    this.pendingPlayerId = this.getPlayerId(this.pendingAuctionAvailablePlayers[0]) || '';
+    this.pendingPlayerId  = this.getPlayerId(this.pendingAuctionAvailablePlayers[0]) || '';
     this.isSetupOpen = true;
   }
 
   openNextPlayer(): void {
     this.pendingAuctionId = this.selectedAuctionId || this.getAuctionId(this.auctions[0]) || '';
-    this.pendingPlayerId = this.getPlayerId(this.pendingAuctionAvailablePlayers[0]) || '';
+    this.pendingPlayerId  = this.getPlayerId(this.pendingAuctionAvailablePlayers[0]) || '';
     this.isNextPlayerOpen = true;
     this.cdr.markForCheck();
   }
@@ -179,6 +195,7 @@ export class AdminDashboard implements OnDestroy {
     this.currentBid         = 0;
     this.currentBidTeamId   = '';
     this.currentBidTeamName = '';
+    this.resetBidTimer();
     const player = this.selectedPlayer;
     this.dashboardSignalR.notifyDashboardUpdated({
       action: 'player-selected',
@@ -205,28 +222,42 @@ export class AdminDashboard implements OnDestroy {
 
   get auctionPlayers(): any[] {
     const auction = this.selectedAuction;
-    return this.players.filter((player) => this.isAuctionItem(player, auction));
+    return this.players.filter((p) => this.isAuctionItem(p, auction));
   }
+
+  private getAttempted(p: any): number | null {
+    const raw = p?.attempted ?? p?.Attempted;
+    if (raw === null || raw === undefined || raw === '') return null;
+    const n = Number(raw);
+    return Number.isFinite(n) ? n : null;
+  }
+
+  private matchesRound(p: any, round: 1 | 2 | 3): boolean {
+    const a = this.getAttempted(p);
+    if (round === 1) return a === null || a === 0;
+    if (round === 2) return a === 1;
+    return a === 2;
+  }
+
 
   get pendingAuction(): any {
-    return this.auctions.find((auction) => this.isSame(this.getAuctionId(auction), this.pendingAuctionId));
-  }
-
-  get pendingAuctionPlayers(): any[] {
-    const auction = this.pendingAuction;
-    return this.players.filter((player) => this.isAuctionItem(player, auction));
+    return this.auctions.find((a) => this.isSame(this.getAuctionId(a), this.pendingAuctionId));
   }
 
   get pendingAuctionAvailablePlayers(): any[] {
-    return this.pendingAuctionPlayers.filter((player) => !this.isSold(player));
+    const auction = this.pendingAuction;
+    return this.players.filter(
+      (p) => this.isAuctionItem(p, auction) && !this.isSold(p) && this.matchesRound(p, this.pendingRound)
+    );
   }
 
+
   get pendingPlayer(): any {
-    return this.pendingAuctionPlayers.find((player) => this.isSame(this.getPlayerId(player), this.pendingPlayerId));
+    return this.pendingAuctionAvailablePlayers.find((p) => this.isSame(this.getPlayerId(p), this.pendingPlayerId));
   }
 
   get soldPlayers(): any[] {
-    return this.auctionPlayers.filter((player) => this.isSold(player));
+    return this.auctionPlayers.filter((p) => this.isSold(p));
   }
 
   get teamSummaries(): TeamSummary[] {
@@ -294,6 +325,7 @@ export class AdminDashboard implements OnDestroy {
     if (!player || this.isBidUpdating) return;
 
     const teamId = this.selectedBidTeamId;
+
     if (!teamId) {
       this.bidActionMessage = 'Team not found for selected player.';
       this.cdr.markForCheck();
@@ -306,8 +338,52 @@ export class AdminDashboard implements OnDestroy {
   markPlayerUnsold(): void {
     const player = this.selectedPlayer;
     if (!player || this.isBidUpdating) return;
-
     this.updatePlayerBidStatus(player, false, 0, null);
+  }
+
+
+  private resetBidTimer(): void {
+    this.clearBidTimer();
+    this.bidTimerSeconds = this.BID_TIMER_DURATION;
+    this.cdr.markForCheck();
+    this.broadcastTimer();
+    this.bidTimerInterval = setInterval(() => {
+      this.bidTimerSeconds--;
+      this.cdr.markForCheck();
+      if (this.bidTimerSeconds <= 0) {
+        this.clearBidTimer();
+        this.onTimerExpired();
+      }
+    }, 1000);
+  }
+
+  private broadcastTimer(): void {
+    this.dashboardSignalR.notifyDashboardUpdated({
+      action: 'timer-reset',
+      entity: 'timer',
+      auctionId: this.selectedAuctionId,
+      playerId: this.selectedPlayerId,
+      playerData: { timerSeconds: this.BID_TIMER_DURATION },
+    });
+  }
+
+  private clearBidTimer(): void {
+    if (this.bidTimerInterval) {
+      clearInterval(this.bidTimerInterval);
+      this.bidTimerInterval = null;
+    }
+    this.bidTimerSeconds = 0;
+  }
+
+  private onTimerExpired(): void {
+    if (this.isBidUpdating) return;
+    const player = this.selectedPlayer;
+    if (!player) return;
+    if (this.currentBidTeamId) {
+      this.updatePlayerBidStatus(player, true, this.currentBidDisplay, this.currentBidTeamId);
+    } else {
+      this.updatePlayerBidStatus(player, false, 0, null);
+    }
   }
 
   private isAuctionItem(item: any, auction: any): boolean {
@@ -331,6 +407,10 @@ export class AdminDashboard implements OnDestroy {
     this.isBidUpdating = true;
     this.bidActionMessage = '';
 
+    // unsold advances attempted by 1 so it moves to the next round queue
+    const currentAttempted = this.getAttempted(player) ?? 0;
+    const attempted = isSold ? currentAttempted : currentAttempted + 1;
+
     const payload = {
       id: this.getPlayerId(player),
       playerName: player?.playerName ?? player?.PlayerName ?? '',
@@ -344,6 +424,7 @@ export class AdminDashboard implements OnDestroy {
       soldPrice,
       isSold,
       teamId,
+      attempted,
       auctionId: this.selectedAuctionId,
       created_By: this.loginEmail,
       updated_By: this.loginEmail,
@@ -357,6 +438,7 @@ export class AdminDashboard implements OnDestroy {
               soldPrice,
               isSold,
               teamId,
+              attempted,
               teamName: isSold ? this.bidTeamName : null,
               updated_By: this.loginEmail,
               updatedAt: new Date().toISOString(),

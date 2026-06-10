@@ -36,7 +36,7 @@ export const routes: Routes = [
       {
         path: 'admin-dashboard',
         canActivate: [roleGuard],
-        data: { roles: ['SuperAdmin'] },
+        data: { roles: ['Admin', 'User', 'SuperAdmin','Team','Player'] },
         loadComponent: () => import('./Component/admin-dashboard/admin-dashboard').then(m => m.AdminDashboard)
       },
       {
@@ -48,39 +48,57 @@ export const routes: Routes = [
       {
         path: 'adminpanel',
         canActivate: [roleGuard],
-        data: { roles: ['SuperAdmin'] },
+        data: { roles: ['Admin', 'User', 'SuperAdmin','Team','Player'] },
         loadComponent: () => import('./Component/admin-panel/admin-panel').then(m => m.AdminPanel)
       },
       {
         path: 'team-panel',
         canActivate: [roleGuard],
-        data: { roles: ['SuperAdmin', 'Admin'] },
+        data: { roles: ['Admin', 'User', 'SuperAdmin','Team','Player'] },
         loadComponent: () => import('./Component/team-panel/team-panel').then(m => m.TeamPanel)
       },
       {
         path: 'player-panel',
         canActivate: [roleGuard],
-        data: { roles: ['SuperAdmin', 'Admin'] },
+        data: { roles: ['Admin', 'User', 'SuperAdmin','Team','Player'] },
         loadComponent: () => import('./Component/player-panel/player-panel').then(m => m.PlayerPanel)
       },
       {
         path: 'auction-panel',
         canActivate: [roleGuard],
-        data: { roles: ['SuperAdmin', 'Admin'] },
+        data: { roles: ['Admin', 'User', 'SuperAdmin','Team','Player']  },
         loadComponent: () => import('./Component/auction-panel/auction-panel').then(m => m.AuctionPanel)
       },
       {
         path: 'menu-access-panel',
         canActivate: [roleGuard],
-        data: { roles: ['SuperAdmin'] },
+        data: { roles: ['Admin', 'User', 'SuperAdmin','Team','Player']  },
         loadComponent: () => import('./Component/menu-access-panel/menu-access-panel').then(m => m.MenuAccessPanel)
       },
       {
         path: 'menu-panel',
         canActivate: [roleGuard],
-        data: { roles: ['SuperAdmin'] },
+        data: { roles: ['Admin', 'User', 'SuperAdmin','Team','Player']  },
         loadComponent: () => import('./Component/menu-panel/menu-panel').then(m => m.MenuPanel)
       },
+            {
+        path: 'aboutus',
+        canActivate: [roleGuard],
+        data: { roles: ['Admin', 'User', 'SuperAdmin','Team','Player']  },
+        loadComponent: () => import('./Component/aboutus/aboutus').then(m => m.Aboutus)
+      },
+                  {
+        path: 'contectus',
+        canActivate: [roleGuard],
+        data: { roles: ['Admin', 'User', 'SuperAdmin','Team','Player']  },
+        loadComponent: () => import('./Component/contectus/contectus').then(m => m.Contectus )
+      },
+                        {
+        path: 'privacypolicy',
+        canActivate: [roleGuard],
+        data: { roles: ['Admin', 'User', 'SuperAdmin','Team','Player']  },
+        loadComponent: () => import('./Component/privacy-policy/privacy-policy').then(m => m.PrivacyPolicy )
+      },
     ]
-  }
+  }   
 ];

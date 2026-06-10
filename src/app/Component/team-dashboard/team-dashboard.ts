@@ -39,7 +39,14 @@ export class TeamDashboard implements OnDestroy {
   livePlayer:    any    = null;
   currentBid:    number = 0;
   currentBidTeamName: string = '';
+  currentBidTeamId:   number | string = '';
   bidMessage:    string = '';
+  isLivePlayerUnsold = false;
+  isLivePlayerSold   = false;
+  isBidCooldown      = false;
+  bidTimerSeconds    = 0;
+  private cooldownTimer: any = null;
+  private timerInterval: any = null;
 
   ngOnInit(): void {
     this.loadData();
@@ -51,9 +58,23 @@ export class TeamDashboard implements OnDestroy {
       .subscribe((payload) => {
         if (payload?.action === 'player-selected') {
           if (this.selectedAuctionId && !this.isSame(this.selectedAuctionId, payload?.auctionId)) return;
-
           this.applyLivePlayerPayload(payload);
-        } else if (payload?.action === 'player-sold' || payload?.action === 'player-unsold') {
+        } else if (payload?.action === 'timer-reset') {
+          if (this.selectedAuctionId && !this.isSame(this.selectedAuctionId, payload?.auctionId)) return;
+          const data = this.parsePlayerData(payload?.playerDataJson);
+          const secs = Number(data?.timerSeconds);
+          if (Number.isFinite(secs) && secs > 0) this.startLocalTimer(secs);
+        } else if (payload?.action === 'player-unsold') {
+          if (this.livePlayer && this.isSame(this.getPlayerId(this.livePlayer), payload?.playerId)) {
+            this.isLivePlayerUnsold = true;
+            this.cdr.markForCheck();
+          }
+          this.loadData(false);
+        } else if (payload?.action === 'player-sold') {
+          if (this.livePlayer && this.isSame(this.getPlayerId(this.livePlayer), payload?.playerId)) {
+            this.isLivePlayerSold = true;
+            this.cdr.markForCheck();
+          }
           this.loadData(false);
         }
       });
@@ -63,8 +84,11 @@ export class TeamDashboard implements OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe((payload) => {
         if (this.livePlayer && this.isSame(this.getPlayerId(this.livePlayer), payload?.playerId)) {
-          this.currentBid = Number(payload?.bidAmount);
+          this.currentBid         = Number(payload?.bidAmount);
           this.currentBidTeamName = payload?.teamName ?? '';
+          this.currentBidTeamId   = payload?.teamId ?? '';
+          this.startCooldown();
+          // timer is reset by admin broadcast; no local reset needed here
           this.cdr.markForCheck();
         }
       });
@@ -73,6 +97,8 @@ export class TeamDashboard implements OnDestroy {
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
+    if (this.cooldownTimer) clearTimeout(this.cooldownTimer);
+    this.clearLocalTimer();
   }
 
   loadData(showLoader = true, targetAuctionId?: any, targetPlayerId?: any): void {
@@ -134,8 +160,10 @@ export class TeamDashboard implements OnDestroy {
     const nextBid = this.currentBid > 0 ? this.currentBid + 200000 : base;
 
     this.currentBid         = nextBid;
+    this.currentBidTeamId   = this.selectedTeamId;
     this.currentBidTeamName = this.getTeamName(this.selectedTeam);
     this.bidMessage         = `Bid of Rs ${nextBid.toLocaleString()} placed!`;
+    this.startCooldown();
 
     this.signalR.placeBid(
       this.selectedAuctionId,
@@ -202,8 +230,15 @@ export class TeamDashboard implements OnDestroy {
       : this.getPlayerBasePrice(this.livePlayer);
   }
 
+  get isMyTeamHighestBidder(): boolean {
+    return this.currentBidTeamId !== '' && this.isSame(this.currentBidTeamId, this.selectedTeamId);
+  }
+
   get canBid(): boolean {
     if (!this.livePlayer || !this.selectedTeam) return false;
+    if (this.isLivePlayerUnsold || this.isLivePlayerSold) return false;
+    if (this.isBidCooldown) return false;
+    if (this.isMyTeamHighestBidder) return false;
     return this.nextBidAmount <= this.remainingPurse && this.nextBidAmount > 0;
   }
 
@@ -229,6 +264,32 @@ export class TeamDashboard implements OnDestroy {
   getAuctionId(a: any): number | string { return a?.auctionId ?? a?.AuctionId ?? a?.id ?? a?.Id ?? ''; }
   getTeamId(t: any):    number | string { return t?.teamId   ?? t?.TeamId   ?? t?.id ?? t?.Id ?? ''; }
   getPlayerId(p: any):  number | string { return p?.playerId ?? p?.PlayerId ?? p?.id ?? ''; }
+
+  private startLocalTimer(seconds: number): void {
+    this.clearLocalTimer();
+    this.bidTimerSeconds = seconds;
+    this.cdr.markForCheck();
+    this.timerInterval = setInterval(() => {
+      this.bidTimerSeconds--;
+      this.cdr.markForCheck();
+      if (this.bidTimerSeconds <= 0) this.clearLocalTimer();
+    }, 1000);
+  }
+
+  private clearLocalTimer(): void {
+    if (this.timerInterval) { clearInterval(this.timerInterval); this.timerInterval = null; }
+    this.bidTimerSeconds = 0;
+  }
+
+  private startCooldown(): void {
+    this.isBidCooldown = true;
+    if (this.cooldownTimer) clearTimeout(this.cooldownTimer);
+    this.cooldownTimer = setTimeout(() => {
+      this.isBidCooldown = false;
+      this.cooldownTimer = null;
+      this.cdr.markForCheck();
+    }, 5000);
+  }
 
   private isAuctionItem(item: any, auction: any): boolean {
     if (!auction) return false;
@@ -269,9 +330,15 @@ export class TeamDashboard implements OnDestroy {
   }
 
   private applyLivePlayerPayload(payload: any): void {
-    this.currentBid = 0;
+    this.currentBid         = 0;
     this.currentBidTeamName = '';
-    this.bidMessage = '';
+    this.currentBidTeamId   = '';
+    this.bidMessage         = '';
+    this.isLivePlayerUnsold = false;
+    this.isLivePlayerSold   = false;
+    this.isBidCooldown      = false;
+    this.clearLocalTimer();
+    if (this.cooldownTimer) { clearTimeout(this.cooldownTimer); this.cooldownTimer = null; }
 
     if (payload?.auctionId != null) this.selectedAuctionId = payload.auctionId;
     const playerData = this.parsePlayerData(payload?.playerDataJson);

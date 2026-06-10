@@ -1,0 +1,50 @@
+.static-page { min-height: 100vh; background: #f8fafc; padding: 32px 16px; }
+.static-container { max-width: 800px; margin: 0 auto; }
+
+.static-header { margin-bottom: 32px; padding-bottom: 20px; border-bottom: 2px solid #e2e8f0; }
+.static-header h1 { margin: 0 0 6px; font-size: 2rem; font-weight: 800; color: #0f172a; }
+.static-header p { margin: 0; color: #64748b; font-size: .9rem; }
+
+.static-body section { margin-bottom: 28px; }
+.static-body h2 { margin: 0 0 10px; font-size: 1.1rem; font-weight: 700; color: #1e293b; }
+.static-body p { margin: 0 0 8px; color: #475569; line-height: 1.75; font-size: .95rem; }
+.static-body ul { margin: 0 0 8px; padding-left: 20px; color: #475569; line-height: 1.75; font-size: .95rem; }
+.static-body li { margin-bottom: 4px; }
+
+.contact-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-top: 8px; }
+.contact-card { display: flex; align-items: flex-start; gap: 14px; padding: 16px; background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; box-shadow: 0 1px 4px rgba(0,0,0,.06); }
+.contact-card .icon { font-size: 1.6rem; flex-shrink: 0; }
+.contact-card h3 { margin: 0 0 4px; font-size: .9rem; font-weight: 700; color: #0f172a; }
+.contact-card p { margin: 0; font-size: .85rem; color: #64748b; }
+.contact-card a { color: #2563eb; text-decoration: none; }
+.contact-card a:hover { text-decoration: underline; }
+
+.contact-form { background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 24px; box-shadow: 0 1px 4px rgba(0,0,0,.06); }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.form-field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px; }
+.form-field label { font-size: .85rem; font-weight: 600; color: #374151; }
+.form-field input, .form-field textarea, .form-field select { padding: 10px 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: .9rem; outline: none; transition: border-color .2s; background: #f9fafb; }
+.form-field input:focus, .form-field textarea:focus { border-color: #2563eb; background: #fff; }
+.form-field textarea { resize: vertical; min-height: 120px; }
+.submit-btn { display: inline-flex; align-items: center; gap: 8px; padding: 10px 24px; background: #2563eb; color: #fff; border: none; border-radius: 8px; font-size: .95rem; font-weight: 600; cursor: pointer; transition: background .2s; }
+.submit-btn:hover { background: #1d4ed8; }
+
+.team-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-top: 8px; }
+.team-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 20px; text-align: center; box-shadow: 0 1px 4px rgba(0,0,0,.06); }
+.team-card .avatar { width: 56px; height: 56px; border-radius: 50%; background: linear-gradient(135deg, #2563eb, #7c3aed); display: flex; align-items: center; justify-content: center; color: #fff; font-size: 1.4rem; font-weight: 700; margin: 0 auto 12px; }
+.team-card h3 { margin: 0 0 4px; font-size: .95rem; font-weight: 700; color: #0f172a; }
+.team-card p { margin: 0; font-size: .8rem; color: #64748b; }
+
+.about-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 16px; margin: 24px 0; }
+.stat-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 20px; text-align: center; box-shadow: 0 1px 4px rgba(0,0,0,.06); }
+.stat-card .stat-value { font-size: 2rem; font-weight: 800; color: #2563eb; }
+.stat-card .stat-label { font-size: .8rem; color: #64748b; margin-top: 4px; }
+
+.static-footer { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-top: 40px; padding-top: 20px; border-top: 1px solid #e2e8f0; color: #94a3b8; font-size: .85rem; }
+.static-footer a { color: #2563eb; text-decoration: none; }
+.static-footer a:hover { text-decoration: underline; }
+
+@media (max-width: 640px) {
+  .form-row { grid-template-columns: 1fr; }
+  .static-header h1 { font-size: 1.5rem; }
+}
